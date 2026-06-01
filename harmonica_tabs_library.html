@@ -30,6 +30,9 @@ body{
     linear-gradient(135deg,#fffdfa 0%, var(--paper) 48%, #eaf5ff 100%);
   min-height:100vh;
 }
+body.song-open{
+  background:var(--card);
+}
 button,input,select,textarea{font:inherit}
 button{
   border:0;
@@ -137,15 +140,29 @@ header p{margin:.65rem auto 0;max-width:46rem;color:#dceeff;font-size:1.05rem;li
   cursor:pointer;
   text-align:left;
   border-left:7px solid var(--gold);
+  background:var(--card);
+  color:var(--ink);
 }
-.song-card:hover,.song-card:focus-within{transform:translateY(-2px);border-color:var(--blue)}
+.song-card:hover,.song-card:focus-within{transform:translateY(-2px);border-color:var(--blue);background:var(--card);color:var(--ink)}
 .song-card[aria-pressed="true"]{border-color:var(--blue);box-shadow:0 14px 28px rgba(23,105,170,.22)}
-.song-card h3{margin:0;font-size:1.18rem}
+.song-card h3{margin:0;font-size:1.18rem;color:var(--ink)}
 .song-meta{display:flex;flex-wrap:wrap;gap:.45rem;color:var(--muted);font-size:.9rem;font-weight:700}
 .song-tags{display:flex;flex-wrap:wrap;gap:.4rem}.tag{background:#edf2f7;color:#334155;border-radius:999px;padding:.3rem .55rem;font-size:.78rem;font-weight:800}.key-badge{background:#fff0bd;color:#654200;border-radius:999px;padding:.3rem .6rem;font-weight:900}
 .detail-empty{padding:2rem;text-align:center;color:var(--muted)}
 .song-detail{overflow:hidden}
 .song-detail.is-empty{box-shadow:none;border-style:dashed;background:rgba(255,255,255,.58)}
+.back-button{background:var(--blue-dark)}
+.description-box{white-space:pre-wrap;line-height:1.7;font-size:1.05rem;background:#f8fafc;border:1px solid #e2e8f0;border-radius:20px;padding:1rem;color:var(--ink)}
+body.song-open header,
+body.song-open .control-tabs,
+body.song-open .tab-panel,
+body.song-open .panel,
+body.song-open footer{display:none}
+body.song-open .container{width:100%;padding:0}
+body.song-open .library-layout{display:block;margin:0}
+body.song-open .song-detail{min-height:100vh;border:0;border-radius:0;box-shadow:none;background:var(--card)}
+body.song-open .detail-hero{position:sticky;top:0;z-index:2}
+body.song-open .section{padding:clamp(1rem,4vw,2.25rem)}
 .catalog-heading{display:flex;justify-content:space-between;gap:.75rem;align-items:center;flex-wrap:wrap}
 .catalog-heading p{margin:0;color:var(--muted);font-weight:700}
 .detail-hero{padding:1.15rem;background:linear-gradient(135deg,#fff8e6,#eaf5ff);border-bottom:1px solid rgba(23,105,170,.12)}
@@ -228,6 +245,9 @@ footer{text-align:center;color:var(--muted);padding:2rem 1rem}
           <label>Tags / categories
             <input id="tagsField" placeholder="folk, beginner, campfire" />
           </label>
+          <label class="wide">Description / practice notes
+            <textarea id="descriptionField" placeholder="Add a short song description, practice goal, or lesson notes."></textarea>
+          </label>
           <label class="wide">Large harmonica tab
             <textarea id="tabsField" required placeholder="4 -4 5 6\n6 5 -4 4"></textarea>
           </label>
@@ -273,6 +293,7 @@ const demoSongs = [
     artist:"Traditional hymn",
     key:"G",
     tags:["hymn","beginner","slow"],
+    description:"A slow, expressive hymn that is great for practicing clean single notes and gentle breathing.",
     tabs:"6  7  8  7  8  -8  7\n6  7  8  7  8  -8  9\n8  9  8  7  6  7  8  7",
     lyrics:"Amazing grace, how sweet the sound\nThat saved a soul like me\nI once was lost, but now am found\nWas blind, but now I see"
   },
@@ -282,6 +303,7 @@ const demoSongs = [
     artist:"Stephen Foster",
     key:"C",
     tags:["folk","campfire","medium"],
+    description:"A bright campfire folk tune with repeated phrases for building steady rhythm and confidence.",
     tabs:"4 4 5 6 6 -6 6 5 4\n4 4 5 6 6 -6 6 5 5\n5 5 -5 6 6 -6 6 5 4",
     lyrics:"I come from Alabama with my banjo on my knee\nI'm going to Louisiana, my true love for to see"
   },
@@ -291,6 +313,7 @@ const demoSongs = [
     artist:"Traditional spiritual",
     key:"F",
     tags:["spiritual","jazz","beginner"],
+    description:"A classic spiritual and jazz standard that works well for practicing short, punchy phrases.",
     tabs:"4 5 -5 6\n4 5 -5 6\n4 5 -5 6 5 4 5\n5 4 5 -4",
     lyrics:"Oh, when the saints go marching in\nOh, when the saints go marching in\nLord, I want to be in that number\nWhen the saints go marching in"
   },
@@ -300,6 +323,7 @@ const demoSongs = [
     artist:"Traditional nursery song",
     key:"C",
     tags:["kids","beginner","practice"],
+    description:"A familiar beginner melody for learning note spacing and smooth movement between holes.",
     tabs:"4 4 6 6 -6 -6 6\n-5 -5 5 5 -4 -4 4\n6 6 -5 -5 5 5 -4",
     lyrics:"Twinkle, twinkle, little star\nHow I wonder what you are\nUp above the world so high\nLike a diamond in the sky"
   }
@@ -354,7 +378,7 @@ function allTags(){
 function filteredSongs(){
   const query = searchInput.value.trim().toLowerCase();
   let result = songs.filter(song => {
-    const haystack = `${song.title} ${song.artist} ${song.key} ${song.tags.join(" ")} ${song.tabs} ${song.lyrics}`.toLowerCase();
+    const haystack = `${song.title} ${song.artist} ${song.key} ${song.tags.join(" ")} ${song.description || ""} ${song.tabs} ${song.lyrics}`.toLowerCase();
     const tagMatch = activeTag === "all" || song.tags.includes(activeTag);
     const favoriteMatch = viewSelect.value !== "favorites" || favorites.has(song.id);
     return haystack.includes(query) && tagMatch && favoriteMatch;
@@ -397,6 +421,7 @@ function renderList(){
 }
 function renderDetail(){
   const song = songs.find(item => item.id === selectedId);
+  document.body.classList.toggle("song-open", Boolean(song));
   libraryLayout.classList.toggle("has-selection", Boolean(song));
   songDetail.classList.toggle("is-empty", !song);
   if(!song){
@@ -408,6 +433,7 @@ function renderDetail(){
       <div class="detail-title">
         <h2>${escapeHtml(song.title)}</h2>
         <div class="detail-actions">
+          <button type="button" class="back-button" id="backToCatalogButton">← Back to catalogue</button>
           <button type="button" class="favorite ${favorites.has(song.id) ? "active" : ""}" id="favoriteButton">${favorites.has(song.id) ? "★ Favorited" : "☆ Favorite"}</button>
           <button type="button" class="secondary" id="deleteButton">Delete</button>
         </div>
@@ -415,8 +441,10 @@ function renderDetail(){
       <div class="keyline"><strong class="key-badge">Key of the song: ${escapeHtml(song.key)}</strong><span>${escapeHtml(song.artist || "Unknown source")}</span></div>
       <div class="song-tags">${song.tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}</div>
     </div>
+    <section class="section"><h3>Description</h3><div class="description-box">${escapeHtml(song.description || "No description saved yet.")}</div></section>
     <section class="section"><h3>Harmonica tabs</h3><div class="tab-box">${escapeHtml(song.tabs)}</div></section>
     <section class="section"><h3>Lyrics / notes</h3><div class="lyrics-box">${escapeHtml(song.lyrics || "No lyrics or notes saved yet.")}</div></section>`;
+  document.getElementById("backToCatalogButton").addEventListener("click", closeSongDetail);
   document.getElementById("favoriteButton").addEventListener("click", () => toggleFavorite(song.id));
   document.getElementById("deleteButton").addEventListener("click", () => deleteSong(song.id));
 }
@@ -424,6 +452,11 @@ function render(){
   renderTags();
   renderList();
   renderDetail();
+}
+function closeSongDetail(){
+  selectedId = null;
+  render();
+  document.querySelector(".catalog-heading")?.scrollIntoView({behavior:"smooth", block:"start"});
 }
 function toggleFavorite(id){
   favorites.has(id) ? favorites.delete(id) : favorites.add(id);
@@ -486,11 +519,12 @@ document.getElementById("songForm").addEventListener("submit", event => {
     key:document.getElementById("keyField").value.trim(),
     artist:document.getElementById("artistField").value.trim(),
     tags:tags.length ? tags : ["uncategorized"],
+    description:document.getElementById("descriptionField").value.trim(),
     tabs:document.getElementById("tabsField").value.trim(),
     lyrics:document.getElementById("lyricsField").value.trim()
   };
   songs.push(song);
-  selectedId = song.id;
+  selectedId = null;
   saveSongs();
   event.target.reset();
   saveNotice.classList.add("show");
