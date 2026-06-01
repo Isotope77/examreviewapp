@@ -132,11 +132,19 @@ header p{margin:.65rem auto 0;max-width:46rem;color:#dceeff;font-size:1.05rem;li
 }
 .panel{padding:1rem}
 .panel h2,.song-detail h2,.editor h2{margin:.1rem 0 1rem;font-size:1.35rem}
-.song-list{display:grid;gap:.85rem}
+.song-list{display:grid;grid-template-columns:1fr;gap:.7rem}
 .song-card{
   display:grid;
-  gap:.55rem;
-  padding:1rem;
+  grid-template-columns:auto minmax(0,1fr);
+  grid-template-areas:
+    "key title"
+    "key meta"
+    "key tags";
+  align-items:center;
+  gap:.35rem .8rem;
+  width:100%;
+  min-height:5.75rem;
+  padding:.95rem 1rem;
   cursor:pointer;
   text-align:left;
   border-left:7px solid var(--gold);
@@ -145,9 +153,10 @@ header p{margin:.65rem auto 0;max-width:46rem;color:#dceeff;font-size:1.05rem;li
 }
 .song-card:hover,.song-card:focus-within{transform:translateY(-2px);border-color:var(--blue);background:var(--card);color:var(--ink)}
 .song-card[aria-pressed="true"]{border-color:var(--blue);box-shadow:0 14px 28px rgba(23,105,170,.22)}
-.song-card h3{margin:0;font-size:1.18rem;color:var(--ink)}
-.song-meta{display:flex;flex-wrap:wrap;gap:.45rem;color:var(--muted);font-size:.9rem;font-weight:700}
-.song-tags{display:flex;flex-wrap:wrap;gap:.4rem}.tag{background:#edf2f7;color:#334155;border-radius:999px;padding:.3rem .55rem;font-size:.78rem;font-weight:800}.key-badge{background:#fff0bd;color:#654200;border-radius:999px;padding:.3rem .6rem;font-weight:900}
+.song-card h3{grid-area:title;margin:0;font-size:1.18rem;color:var(--ink)}
+.song-meta{grid-area:meta;display:flex;flex-wrap:wrap;gap:.45rem;color:var(--muted);font-size:.9rem;font-weight:700}
+.song-tags{grid-area:tags;display:flex;flex-wrap:wrap;gap:.4rem}.tag{background:#edf2f7;color:#334155;border-radius:999px;padding:.3rem .55rem;font-size:.78rem;font-weight:800}.key-badge{background:#fff0bd;color:#654200;border-radius:999px;padding:.3rem .6rem;font-weight:900}
+.song-card > .key-badge{grid-area:key;align-self:stretch;display:flex;align-items:center;justify-content:center;min-width:4.25rem;border-radius:18px}
 .detail-empty{padding:2rem;text-align:center;color:var(--muted)}
 .song-detail{overflow:hidden}
 .song-detail.is-empty{box-shadow:none;border-style:dashed;background:rgba(255,255,255,.58)}
@@ -185,8 +194,8 @@ body.song-open .section{padding:clamp(1rem,4vw,2.25rem)}
 .editor{padding:0;background:transparent;border:0;box-shadow:none}.form-grid{display:grid;grid-template-columns:1fr;gap:.5rem}.editor-actions{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1rem}.notice{padding:.85rem 1rem;border-radius:16px;background:#e6fffa;color:#234e52;font-weight:800;display:none}.notice.show{display:block}.empty-results{text-align:center;color:var(--muted);padding:1.5rem}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-top:1rem}.stat{background:white;border-radius:18px;padding:.75rem;text-align:center;border:1px solid #edf2f7}.stat b{display:block;font-size:1.3rem;color:var(--blue-dark)}
 footer{text-align:center;color:var(--muted);padding:2rem 1rem}
 @media (min-width:720px){
-  .toolbar-row{grid-template-columns:2fr 1fr 1fr}.library-layout{grid-template-columns:minmax(0,1.6fr) minmax(320px,.9fr);align-items:start}.library-layout:not(.has-selection){grid-template-columns:1fr}.form-grid{grid-template-columns:1fr 1fr}.form-grid .wide{grid-column:1/-1}.container{padding:1.25rem}.section,.detail-hero{padding:1.35rem}.tab-panel{padding:1.25rem}.panel{min-height:62vh}.song-list{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}.library-layout.has-selection .song-list{grid-template-columns:1fr;max-height:72vh;overflow:auto;padding-right:.25rem}}
-@media (max-width:520px){button{width:100%}.control-tabs{border-radius:24px}.detail-actions button{width:auto;flex:1}.stats{grid-template-columns:1fr}.song-card{border-left-width:5px}.tab-box{margin-left:-.15rem;margin-right:-.15rem}}
+  .toolbar-row{grid-template-columns:2fr 1fr 1fr}.library-layout{grid-template-columns:minmax(0,1.6fr) minmax(320px,.9fr);align-items:start}.library-layout:not(.has-selection){grid-template-columns:1fr}.form-grid{grid-template-columns:1fr 1fr}.form-grid .wide{grid-column:1/-1}.container{padding:1.25rem}.section,.detail-hero{padding:1.35rem}.tab-panel{padding:1.25rem}.panel{min-height:62vh}.library-layout.has-selection .song-list{max-height:72vh;overflow:auto;padding-right:.25rem}}
+@media (max-width:520px){button{width:100%}.control-tabs{border-radius:24px}.detail-actions button{width:auto;flex:1}.stats{grid-template-columns:1fr}.song-card{grid-template-columns:1fr;grid-template-areas:"title" "meta" "tags";border-left-width:5px}.song-card > .key-badge{display:none}.tab-box{margin-left:-.15rem;margin-right:-.15rem}}
 </style>
 </head>
 <body>
@@ -415,7 +424,8 @@ function renderList(){
   songList.innerHTML = visible.map(song => `
     <button class="song-card" type="button" data-id="${escapeHtml(song.id)}" aria-pressed="${song.id === selectedId}">
       <h3>${favorites.has(song.id) ? "★ " : ""}${escapeHtml(song.title)}</h3>
-      <div class="song-meta"><span class="key-badge">Key: ${escapeHtml(song.key)}</span><span>${escapeHtml(song.artist || "Unknown source")}</span></div>
+      <span class="key-badge">${escapeHtml(song.key)}</span>
+      <div class="song-meta"><span>Key: ${escapeHtml(song.key)}</span><span>${escapeHtml(song.artist || "Unknown source")}</span></div>
       <div class="song-tags">${song.tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}</div>
     </button>`).join("");
 }
@@ -441,9 +451,9 @@ function renderDetail(){
       <div class="keyline"><strong class="key-badge">Key of the song: ${escapeHtml(song.key)}</strong><span>${escapeHtml(song.artist || "Unknown source")}</span></div>
       <div class="song-tags">${song.tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}</div>
     </div>
-    <section class="section"><h3>Description</h3><div class="description-box">${escapeHtml(song.description || "No description saved yet.")}</div></section>
     <section class="section"><h3>Harmonica tabs</h3><div class="tab-box">${escapeHtml(song.tabs)}</div></section>
-    <section class="section"><h3>Lyrics / notes</h3><div class="lyrics-box">${escapeHtml(song.lyrics || "No lyrics or notes saved yet.")}</div></section>`;
+    <section class="section"><h3>Lyrics / notes</h3><div class="lyrics-box">${escapeHtml(song.lyrics || "No lyrics or notes saved yet.")}</div></section>
+    <section class="section"><h3>Description</h3><div class="description-box">${escapeHtml(song.description || "No description saved yet.")}</div></section>`;
   document.getElementById("backToCatalogButton").addEventListener("click", closeSongDetail);
   document.getElementById("favoriteButton").addEventListener("click", () => toggleFavorite(song.id));
   document.getElementById("deleteButton").addEventListener("click", () => deleteSong(song.id));
