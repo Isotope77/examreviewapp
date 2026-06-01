@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Harmonica Tab Library</title>
+<style>
+:root{
+  --ink:#17212f;
+  --muted:#5d6a7d;
+  --paper:#fff9ef;
+  --cream:#fff4da;
+  --card:#ffffff;
+  --gold:#f0b429;
+  --gold-dark:#b7791f;
+  --blue:#1769aa;
+  --blue-dark:#0f4c81;
+  --green:#2f855a;
+  --red:#c53030;
+  --shadow:0 18px 45px rgba(23,33,47,.16);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(circle at 10% 0%, rgba(240,180,41,.38), transparent 32rem),
+    linear-gradient(135deg,#fffdfa 0%, var(--paper) 48%, #eaf5ff 100%);
+  min-height:100vh;
+}
+button,input,select,textarea{font:inherit}
+button{
+  border:0;
+  border-radius:999px;
+  padding:.78rem 1rem;
+  font-weight:800;
+  cursor:pointer;
+  background:var(--blue);
+  color:white;
+  box-shadow:0 8px 18px rgba(23,105,170,.18);
+}
+button:hover,button:focus-visible{background:var(--blue-dark);transform:translateY(-1px)}
+button.secondary{background:#edf2f7;color:var(--ink);box-shadow:none}
+button.secondary:hover,button.secondary:focus-visible{background:#dbe7f3}
+button.favorite{background:var(--gold);color:#3b2600;box-shadow:0 8px 18px rgba(240,180,41,.24)}
+button.favorite.active{background:var(--red);color:white}
+input,select,textarea{
+  width:100%;
+  border:1px solid #cbd5e0;
+  border-radius:16px;
+  padding:.85rem 1rem;
+  background:white;
+  color:var(--ink);
+}
+textarea{min-height:8rem;resize:vertical}
+label{display:block;font-weight:800;margin:.8rem 0 .35rem}
+header{
+  padding:2.25rem 1rem 1.25rem;
+  text-align:center;
+  background:linear-gradient(135deg,#17324d,#0f4c81);
+  color:white;
+  border-bottom:7px solid var(--gold);
+}
+header h1{margin:0;font-size:clamp(2rem,8vw,4rem);letter-spacing:-.06em}
+header p{margin:.65rem auto 0;max-width:46rem;color:#dceeff;font-size:1.05rem;line-height:1.55}
+.container{width:min(1120px,100%);margin:auto;padding:1rem}
+.toolbar{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:.85rem;
+  margin-top:1rem;
+  padding:1rem;
+  background:rgba(255,255,255,.76);
+  border:1px solid rgba(23,105,170,.18);
+  border-radius:28px;
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(10px);
+}
+.toolbar-row{display:grid;grid-template-columns:1fr;gap:.85rem}
+.tag-filter{display:flex;gap:.55rem;overflow-x:auto;padding:.15rem .05rem .45rem;scrollbar-width:thin}
+.chip{
+  display:inline-flex;
+  align-items:center;
+  gap:.35rem;
+  border:1px solid #cbd5e0;
+  border-radius:999px;
+  padding:.55rem .8rem;
+  background:white;
+  color:var(--ink);
+  font-weight:800;
+  white-space:nowrap;
+  cursor:pointer;
+}
+.chip.active{background:var(--blue);border-color:var(--blue);color:white}
+.chip .count{font-size:.78rem;opacity:.75}
+.library-layout{display:grid;grid-template-columns:1fr;gap:1rem;margin-top:1rem}
+.panel,.song-detail,.song-card,.editor{
+  background:rgba(255,255,255,.88);
+  border:1px solid rgba(23,105,170,.16);
+  border-radius:28px;
+  box-shadow:var(--shadow);
+}
+.panel{padding:1rem}
+.panel h2,.song-detail h2,.editor h2{margin:.1rem 0 1rem;font-size:1.35rem}
+.song-list{display:grid;gap:.85rem}
+.song-card{
+  display:grid;
+  gap:.55rem;
+  padding:1rem;
+  cursor:pointer;
+  text-align:left;
+  border-left:7px solid var(--gold);
+}
+.song-card:hover,.song-card:focus-within{transform:translateY(-2px);border-color:var(--blue)}
+.song-card h3{margin:0;font-size:1.18rem}
+.song-meta{display:flex;flex-wrap:wrap;gap:.45rem;color:var(--muted);font-size:.9rem;font-weight:700}
+.song-tags{display:flex;flex-wrap:wrap;gap:.4rem}.tag{background:#edf2f7;color:#334155;border-radius:999px;padding:.3rem .55rem;font-size:.78rem;font-weight:800}.key-badge{background:#fff0bd;color:#654200;border-radius:999px;padding:.3rem .6rem;font-weight:900}
+.detail-empty{padding:2rem;text-align:center;color:var(--muted)}
+.song-detail{overflow:hidden}
+.detail-hero{padding:1.15rem;background:linear-gradient(135deg,#fff8e6,#eaf5ff);border-bottom:1px solid rgba(23,105,170,.12)}
+.detail-title{display:flex;justify-content:space-between;gap:.75rem;align-items:flex-start}.detail-title h2{font-size:clamp(1.7rem,7vw,2.7rem);line-height:1;margin:0}.detail-actions{display:flex;gap:.45rem;flex-wrap:wrap;justify-content:flex-end}
+.keyline{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.8rem;align-items:center}.keyline strong{font-size:1.05rem}.section{padding:1rem;border-top:1px solid #edf2f7}.section h3{margin:.1rem 0 .75rem;color:var(--blue-dark)}
+.tab-box{
+  white-space:pre-wrap;
+  font-family:"Arial Rounded MT Bold", "Trebuchet MS", ui-rounded, system-ui, sans-serif;
+  font-size:clamp(1.8rem,9vw,3.4rem);
+  line-height:1.45;
+  letter-spacing:.03em;
+  background:#111827;
+  color:#fff6c7;
+  border-radius:24px;
+  padding:1rem;
+  overflow-x:auto;
+  box-shadow:inset 0 0 0 2px rgba(240,180,41,.35);
+}
+.lyrics-box{white-space:pre-wrap;line-height:1.75;font-size:1.08rem;background:var(--cream);border-radius:20px;padding:1rem}
+.editor{margin-top:1rem;padding:1rem}.form-grid{display:grid;grid-template-columns:1fr;gap:.5rem}.editor-actions{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1rem}.notice{padding:.85rem 1rem;border-radius:16px;background:#e6fffa;color:#234e52;font-weight:800;display:none}.notice.show{display:block}.empty-results{text-align:center;color:var(--muted);padding:1.5rem}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-top:1rem}.stat{background:white;border-radius:18px;padding:.75rem;text-align:center;border:1px solid #edf2f7}.stat b{display:block;font-size:1.3rem;color:var(--blue-dark)}
+footer{text-align:center;color:var(--muted);padding:2rem 1rem}
+@media (min-width:720px){
+  .toolbar-row{grid-template-columns:2fr 1fr 1fr}.library-layout{grid-template-columns:minmax(280px,390px) 1fr;align-items:start}.form-grid{grid-template-columns:1fr 1fr}.form-grid .wide{grid-column:1/-1}.container{padding:1.25rem}.section,.detail-hero{padding:1.35rem}.toolbar{padding:1.25rem}.panel{position:sticky;top:1rem}.song-list{max-height:72vh;overflow:auto;padding-right:.25rem}.editor{grid-column:1/-1}}
+@media (max-width:520px){button{width:100%}.detail-actions button{width:auto;flex:1}.stats{grid-template-columns:1fr}.song-card{border-left-width:5px}.tab-box{margin-left:-.15rem;margin-right:-.15rem}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Harmonica Tab Library</h1>
+  <p>Save song tabs, lyrics, keys, tags, and favorites in a mobile-first catalogue built for quick practice sessions.</p>
+</header>
+<main class="container">
+  <section class="toolbar" aria-label="Library controls">
+    <div class="toolbar-row">
+      <label>Search songs, lyrics, or tabs
+        <input id="searchInput" type="search" placeholder="Try: blues, C, grace, -4 5..." />
+      </label>
+      <label>Sort by
+        <select id="sortSelect">
+          <option value="title">Title A-Z</option>
+          <option value="key">Song key</option>
+          <option value="category">Category/tag</option>
+          <option value="favorite">Favorites first</option>
+        </select>
+      </label>
+      <label>View
+        <select id="viewSelect">
+          <option value="all">All songs</option>
+          <option value="favorites">Favorites only</option>
+        </select>
+      </label>
+    </div>
+    <div>
+      <strong>Sortable categories</strong>
+      <div class="tag-filter" id="tagFilter" aria-label="Filter by category"></div>
+    </div>
+  </section>
+
+  <section class="library-layout">
+    <aside class="panel">
+      <h2>Catalogue</h2>
+      <div id="songList" class="song-list"></div>
+      <div class="stats" aria-label="Library statistics">
+        <div class="stat"><b id="totalCount">0</b>songs</div>
+        <div class="stat"><b id="favoriteCount">0</b>faves</div>
+        <div class="stat"><b id="tagCount">0</b>tags</div>
+      </div>
+    </aside>
+
+    <article id="songDetail" class="song-detail" aria-live="polite">
+      <div class="detail-empty">Choose a song from the catalogue to view large harmonica tabs, lyrics, and the song key.</div>
+    </article>
+
+    <section class="editor" aria-label="Add a song">
+      <h2>Add a song to the library</h2>
+      <p class="notice" id="saveNotice">Song saved to this browser.</p>
+      <form id="songForm">
+        <div class="form-grid">
+          <label>Song title
+            <input id="titleField" required placeholder="Song title" />
+          </label>
+          <label>Key of the song
+            <input id="keyField" required placeholder="C, G, Am..." />
+          </label>
+          <label>Artist / source
+            <input id="artistField" placeholder="Traditional, artist name, or source" />
+          </label>
+          <label>Tags / categories
+            <input id="tagsField" placeholder="folk, beginner, campfire" />
+          </label>
+          <label class="wide">Large harmonica tab
+            <textarea id="tabsField" required placeholder="4 -4 5 6\n6 5 -4 4"></textarea>
+          </label>
+          <label class="wide">Lyrics
+            <textarea id="lyricsField" placeholder="Add public-domain lyrics or your own notes here."></textarea>
+          </label>
+        </div>
+        <div class="editor-actions">
+          <button type="submit">Save song</button>
+          <button type="button" class="secondary" id="resetLibraryButton">Reset demo library</button>
+        </div>
+      </form>
+    </section>
+  </section>
+</main>
+<footer>Favorites and custom songs are saved with localStorage on this device.</footer>
+<script>
+const demoSongs = [
+  {
+    id:"amazing-grace",
+    title:"Amazing Grace",
+    artist:"Traditional hymn",
+    key:"G",
+    tags:["hymn","beginner","slow"],
+    tabs:"6  7  8  7  8  -8  7\n6  7  8  7  8  -8  9\n8  9  8  7  6  7  8  7",
+    lyrics:"Amazing grace, how sweet the sound\nThat saved a soul like me\nI once was lost, but now am found\nWas blind, but now I see"
+  },
+  {
+    id:"oh-susanna",
+    title:"Oh! Susanna",
+    artist:"Stephen Foster",
+    key:"C",
+    tags:["folk","campfire","medium"],
+    tabs:"4 4 5 6 6 -6 6 5 4\n4 4 5 6 6 -6 6 5 5\n5 5 -5 6 6 -6 6 5 4",
+    lyrics:"I come from Alabama with my banjo on my knee\nI'm going to Louisiana, my true love for to see"
+  },
+  {
+    id:"when-the-saints",
+    title:"When the Saints Go Marching In",
+    artist:"Traditional spiritual",
+    key:"F",
+    tags:["spiritual","jazz","beginner"],
+    tabs:"4 5 -5 6\n4 5 -5 6\n4 5 -5 6 5 4 5\n5 4 5 -4",
+    lyrics:"Oh, when the saints go marching in\nOh, when the saints go marching in\nLord, I want to be in that number\nWhen the saints go marching in"
+  },
+  {
+    id:"twinkle",
+    title:"Twinkle, Twinkle, Little Star",
+    artist:"Traditional nursery song",
+    key:"C",
+    tags:["kids","beginner","practice"],
+    tabs:"4 4 6 6 -6 -6 6\n-5 -5 5 5 -4 -4 4\n6 6 -5 -5 5 5 -4",
+    lyrics:"Twinkle, twinkle, little star\nHow I wonder what you are\nUp above the world so high\nLike a diamond in the sky"
+  }
+];
+
+const libraryKey = "harmonicaTabLibrary.v1";
+const favoritesKey = "harmonicaTabFavorites.v1";
+let songs = loadSongs();
+let favorites = new Set(JSON.parse(localStorage.getItem(favoritesKey) || "[]"));
+let activeTag = "all";
+let selectedId = songs[0]?.id;
+
+const songList = document.getElementById("songList");
+const songDetail = document.getElementById("songDetail");
+const searchInput = document.getElementById("searchInput");
+const sortSelect = document.getElementById("sortSelect");
+const viewSelect = document.getElementById("viewSelect");
+const tagFilter = document.getElementById("tagFilter");
+const saveNotice = document.getElementById("saveNotice");
+
+function loadSongs(){
+  const saved = localStorage.getItem(libraryKey);
+  return saved ? JSON.parse(saved) : demoSongs;
+}
+function saveSongs(){
+  localStorage.setItem(libraryKey, JSON.stringify(songs));
+}
+function saveFavorites(){
+  localStorage.setItem(favoritesKey, JSON.stringify([...favorites]));
+}
+function slugify(value){
+  return value.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"") || `song-${Date.now()}`;
+}
+function escapeHtml(value){
+  return String(value).replace(/[&<>"']/g, character => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    "\"":"&quot;",
+    "'":"&#039;"
+  }[character]));
+}
+function allTags(){
+  return [...new Set(songs.flatMap(song => song.tags))].sort((a,b)=>a.localeCompare(b));
+}
+function filteredSongs(){
+  const query = searchInput.value.trim().toLowerCase();
+  let result = songs.filter(song => {
+    const haystack = `${song.title} ${song.artist} ${song.key} ${song.tags.join(" ")} ${song.tabs} ${song.lyrics}`.toLowerCase();
+    const tagMatch = activeTag === "all" || song.tags.includes(activeTag);
+    const favoriteMatch = viewSelect.value !== "favorites" || favorites.has(song.id);
+    return haystack.includes(query) && tagMatch && favoriteMatch;
+  });
+  const sortBy = sortSelect.value;
+  result.sort((a,b)=>{
+    if(sortBy === "favorite") return Number(favorites.has(b.id)) - Number(favorites.has(a.id)) || a.title.localeCompare(b.title);
+    if(sortBy === "key") return a.key.localeCompare(b.key) || a.title.localeCompare(b.title);
+    if(sortBy === "category") return (a.tags[0] || "").localeCompare(b.tags[0] || "") || a.title.localeCompare(b.title);
+    return a.title.localeCompare(b.title);
+  });
+  return result;
+}
+function renderTags(){
+  const tags = allTags();
+  const buttons = [`<button class="chip ${activeTag === "all" ? "active" : ""}" data-tag="all" type="button">All <span class="count">${songs.length}</span></button>`];
+  tags.forEach(tag => {
+    const count = songs.filter(song => song.tags.includes(tag)).length;
+    buttons.push(`<button class="chip ${activeTag === tag ? "active" : ""}" data-tag="${escapeHtml(tag)}" type="button">${escapeHtml(tag)} <span class="count">${count}</span></button>`);
+  });
+  tagFilter.innerHTML = buttons.join("");
+}
+function renderList(){
+  const visible = filteredSongs();
+  document.getElementById("totalCount").textContent = songs.length;
+  document.getElementById("favoriteCount").textContent = favorites.size;
+  document.getElementById("tagCount").textContent = allTags().length;
+  if(!visible.length){
+    songList.innerHTML = `<div class="empty-results">No songs match this search or category.</div>`;
+    return;
+  }
+  if(!visible.some(song => song.id === selectedId)) selectedId = visible[0].id;
+  songList.innerHTML = visible.map(song => `
+    <button class="song-card" type="button" data-id="${escapeHtml(song.id)}" aria-pressed="${song.id === selectedId}">
+      <h3>${favorites.has(song.id) ? "★ " : ""}${escapeHtml(song.title)}</h3>
+      <div class="song-meta"><span class="key-badge">Key: ${escapeHtml(song.key)}</span><span>${escapeHtml(song.artist || "Unknown source")}</span></div>
+      <div class="song-tags">${song.tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}</div>
+    </button>`).join("");
+}
+function renderDetail(){
+  const song = songs.find(item => item.id === selectedId);
+  if(!song){
+    songDetail.innerHTML = `<div class="detail-empty">Choose a song from the catalogue to view large harmonica tabs, lyrics, and the song key.</div>`;
+    return;
+  }
+  songDetail.innerHTML = `
+    <div class="detail-hero">
+      <div class="detail-title">
+        <h2>${escapeHtml(song.title)}</h2>
+        <div class="detail-actions">
+          <button type="button" class="favorite ${favorites.has(song.id) ? "active" : ""}" id="favoriteButton">${favorites.has(song.id) ? "★ Favorited" : "☆ Favorite"}</button>
+          <button type="button" class="secondary" id="deleteButton">Delete</button>
+        </div>
+      </div>
+      <div class="keyline"><strong class="key-badge">Key of the song: ${escapeHtml(song.key)}</strong><span>${escapeHtml(song.artist || "Unknown source")}</span></div>
+      <div class="song-tags">${song.tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}</div>
+    </div>
+    <section class="section"><h3>Harmonica tabs</h3><div class="tab-box">${escapeHtml(song.tabs)}</div></section>
+    <section class="section"><h3>Lyrics / notes</h3><div class="lyrics-box">${escapeHtml(song.lyrics || "No lyrics or notes saved yet.")}</div></section>`;
+  document.getElementById("favoriteButton").addEventListener("click", () => toggleFavorite(song.id));
+  document.getElementById("deleteButton").addEventListener("click", () => deleteSong(song.id));
+}
+function render(){
+  renderTags();
+  renderList();
+  renderDetail();
+}
+function toggleFavorite(id){
+  favorites.has(id) ? favorites.delete(id) : favorites.add(id);
+  saveFavorites();
+  render();
+}
+function deleteSong(id){
+  const song = songs.find(item => item.id === id);
+  if(!song || !confirm(`Delete "${song.title}" from this browser?`)) return;
+  songs = songs.filter(item => item.id !== id);
+  favorites.delete(id);
+  selectedId = songs[0]?.id;
+  saveSongs();
+  saveFavorites();
+  render();
+}
+
+tagFilter.addEventListener("click", event => {
+  const button = event.target.closest("button[data-tag]");
+  if(!button) return;
+  activeTag = button.dataset.tag;
+  render();
+});
+songList.addEventListener("click", event => {
+  const card = event.target.closest("button[data-id]");
+  if(!card) return;
+  selectedId = card.dataset.id;
+  render();
+  songDetail.scrollIntoView({behavior:"smooth", block:"start"});
+});
+[searchInput, sortSelect, viewSelect].forEach(control => control.addEventListener("input", render));
+
+document.getElementById("songForm").addEventListener("submit", event => {
+  event.preventDefault();
+  const title = document.getElementById("titleField").value.trim();
+  const idBase = slugify(title);
+  const id = songs.some(song => song.id === idBase) ? `${idBase}-${Date.now()}` : idBase;
+  const tags = document.getElementById("tagsField").value.split(",").map(tag => tag.trim().toLowerCase()).filter(Boolean);
+  const song = {
+    id,
+    title,
+    key:document.getElementById("keyField").value.trim(),
+    artist:document.getElementById("artistField").value.trim(),
+    tags:tags.length ? tags : ["uncategorized"],
+    tabs:document.getElementById("tabsField").value.trim(),
+    lyrics:document.getElementById("lyricsField").value.trim()
+  };
+  songs.push(song);
+  selectedId = song.id;
+  saveSongs();
+  event.target.reset();
+  saveNotice.classList.add("show");
+  setTimeout(()=>saveNotice.classList.remove("show"), 2400);
+  render();
+});
+
+document.getElementById("resetLibraryButton").addEventListener("click", () => {
+  if(!confirm("Reset custom songs and favorites to the demo library?")) return;
+  songs = demoSongs;
+  favorites = new Set();
+  selectedId = songs[0].id;
+  saveSongs();
+  saveFavorites();
+  render();
+});
+
+render();
+</script>
+</body>
+</html>
