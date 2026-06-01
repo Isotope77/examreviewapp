@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Economics Final Exam Review Game</title>
+<style>
+:root{
+  --navy:#071b3f;
+  --navy2:#0d2d63;
+  --yellow:#ffd21f;
+  --yellow2:#fff2a8;
+  --white:#f7fbff;
+  --soft:#d8e6ff;
+  --card:rgba(255,255,255,.10);
+  --good:#77e28b;
+  --bad:#ff8d8d;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial, Helvetica, sans-serif;
+  background:radial-gradient(circle at top left,#174487,#071b3f 58%);
+  color:var(--white);
+}
+header{
+  padding:28px 18px;
+  text-align:center;
+  background:rgba(0,0,0,.25);
+  border-bottom:6px solid var(--yellow);
+}
+h1{margin:0;color:var(--yellow);font-size:2.3rem}
+.subtitle{color:var(--soft);margin-top:8px;font-size:1.05rem}
+.container{max-width:1150px;margin:auto;padding:22px}
+.card{
+  background:var(--card);
+  border:2px solid rgba(255,210,31,.28);
+  border-radius:20px;
+  padding:22px;
+  margin:0 0 22px;
+  box-shadow:0 8px 24px rgba(0,0,0,.25);
+}
+h2{color:var(--yellow);margin-top:0}
+h3{margin-bottom:8px;color:var(--yellow2)}
+button{
+  background:var(--yellow);
+  color:var(--navy);
+  border:0;
+  border-radius:14px;
+  padding:12px 16px;
+  font-weight:800;
+  cursor:pointer;
+  margin:6px 6px 6px 0;
+  font-size:.98rem;
+}
+button:hover{filter:brightness(1.06);transform:translateY(-1px)}
+select,textarea{
+  width:100%;
+  padding:10px;
+  border:0;
+  border-radius:12px;
+  font-size:1rem;
+  margin-top:8px;
+}
+textarea{min-height:105px;resize:vertical}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px}
+.item,.question,.dropzone,.termchip{
+  background:rgba(255,255,255,.10);
+  padding:14px;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.15);
+}
+.termchip{
+  display:inline-block;
+  margin:5px;
+  cursor:grab;
+  border:2px solid rgba(255,210,31,.35);
+}
+.dropzone{
+  min-height:85px;
+  border:2px dashed rgba(255,210,31,.55);
+}
+.correct{outline:3px solid var(--good)}
+.incorrect{outline:3px solid var(--bad)}
+.result{font-weight:800;margin-top:12px;font-size:1.1rem}
+.small{font-size:.92rem;color:var(--soft)}
+.progress{
+  background:rgba(255,255,255,.13);
+  border-radius:999px;
+  overflow:hidden;
+  height:18px;
+  margin-top:10px;
+}
+.bar{height:18px;background:var(--yellow);width:0%;transition:.3s}
+.badge{
+  display:inline-block;
+  background:rgba(255,210,31,.18);
+  border:1px solid rgba(255,210,31,.35);
+  color:var(--yellow2);
+  border-radius:999px;
+  padding:6px 10px;
+  margin:4px;
+}
+.feedback{
+  background:rgba(0,0,0,.18);
+  border-left:6px solid var(--yellow);
+  padding:12px;
+  border-radius:12px;
+  margin-top:10px;
+}
+footer{text-align:center;color:var(--soft);padding:28px}
+
+.vocabTabs{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:14px;
+}
+.tabButton{
+  width:auto;
+  margin:4px 4px 8px 0;
+  background:rgba(255,210,31,.18);
+  color:var(--yellow2);
+  border:1px solid rgba(255,210,31,.45);
+}
+.tabButton.active{
+  background:var(--yellow);
+  color:var(--navy);
+}
+.tabPanel{display:none}
+.tabPanel.active{display:block}
+.flashcard{
+  min-height:280px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  text-align:center;
+  font-size:1.35rem;
+  line-height:1.45;
+  cursor:pointer;
+  padding:26px;
+}
+.flashcard strong{
+  font-size:2.5rem;
+  line-height:1.15;
+  color:var(--yellow2);
+}
+.flashcard .label{
+  color:var(--yellow2);
+  font-size:.95rem;
+  margin-bottom:14px;
+}
+.answerTable{
+  width:100%;
+  border-collapse:collapse;
+}
+.answerTable th,
+.answerTable td{
+  padding:12px;
+  text-align:left;
+  border-bottom:1px solid rgba(255,255,255,.14);
+  vertical-align:top;
+}
+.answerTable th{
+  background:rgba(255,210,31,.18);
+  color:var(--yellow2);
+}
+.answerTable td:first-child{
+  font-weight:bold;
+  color:var(--yellow2);
+}
+@media (max-width:700px){
+  .tabButton{width:100%}
+  .matchGrid{grid-template-columns:repeat(2,1fr);grid-template-rows:auto;}
+  .flashcard{
+    min-height:310px;
+    font-size:1.45rem;
+  }
+  .flashcard strong{
+    font-size:2.7rem;
+  }
+}
+
+
+.mcChoice{
+  display:flex;
+  flex-direction:row;
+  align-items:flex-start;
+  justify-content:flex-start;
+  gap:10px;
+  margin-top:8px;
+  text-align:left;
+  width:100%;
+}
+.question input[type="checkbox"]{width:auto;margin-right:8px;}
+.mcChoice input[type="radio"]{
+  width:auto;
+  flex:0 0 auto;
+  margin:3px 0 0 0;
+  padding:0;
+}
+.mcChoice span{
+  display:block;
+  flex:1;
+  text-align:left;
+}
+
+
+.matchGameControls{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  align-items:center;
+  margin:14px 0;
+}
+.matchStat{
+  background:rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:14px;
+  padding:10px 14px;
+  font-weight:bold;
+}
+.matchGrid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  grid-template-rows:repeat(3,minmax(105px,auto));
+  gap:12px;
+  margin-top:14px;
+}
+.matchCardGame{
+  min-height:92px;
+  background:rgba(255,255,255,.10);
+  border:2px solid rgba(255,210,31,.35);
+  border-radius:16px;
+  padding:12px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  line-height:1.25;
+  transition:.15s;
+}
+.matchCardGame:hover{
+  transform:translateY(-2px);
+  background:rgba(255,255,255,.15);
+}
+.matchCardGame.selected{
+  outline:4px solid var(--yellow);
+  background:rgba(255,210,31,.22);
+}
+.matchCardGame.matched{
+  background:rgba(119,226,139,.22);
+  border-color:var(--good);
+  color:#dfffe5;
+  cursor:default;
+  opacity:.72;
+}
+.matchCardGame.wrong{
+  animation:shake .25s;
+  border-color:var(--bad);
+}
+.matchType{
+  display:block;
+  color:var(--yellow2);
+  font-size:.78rem;
+  margin-bottom:6px;
+  font-weight:bold;
+}
+@keyframes shake{
+  0%{transform:translateX(0)}
+  25%{transform:translateX(-5px)}
+  50%{transform:translateX(5px)}
+  75%{transform:translateX(-3px)}
+  100%{transform:translateX(0)}
+}
+
+</style>
+</head>
+<body>
+<header>
+  <h1>Economics Final Exam Review Game</h1>
+  <div class="subtitle">Practice the ideas, check your thinking, and build confidence.</div>
+</header>
+
+<div class="container">
+
+<div class="card">
+  <h2>🌟 Exam Mindset</h2>
+  <p>You are not trying to memorize every sentence. You are practicing how to recognize concepts, explain cause and effect, and use economics vocabulary clearly.</p>
+  <span class="badge">Read carefully</span>
+  <span class="badge">Eliminate weak answers</span>
+  <span class="badge">Use vocab</span>
+  <span class="badge">Give examples</span>
+</div>
+
+<div class="card">
+  <h2>1. Vocabulary Practice</h2>
+  <p class="small">These definitions match the exam wording. Choose the review style that works best for you.</p>
+
+  <div class="vocabTabs">
+    <button class="tabButton active" onclick="showVocabTab('dropdownTab', this)">Dropdown Match</button>
+    <button class="tabButton" onclick="showVocabTab('flashcardTab', this)">Flashcards</button>
+    <button class="tabButton" onclick="showVocabTab('timedMatchTab', this)">Timed Match</button>
+    <button class="tabButton" onclick="showVocabTab('answerKeyTab', this)">Answer Key</button>
+  </div>
+
+  <div id="dropdownTab" class="tabPanel active">
+    <p class="small">Pick the best term for each definition, then check your score.</p>
+    <div id="vocabQuiz"></div>
+    <button onclick="checkVocab()">Check Vocabulary</button>
+    <button onclick="resetVocab()">Reset</button>
+    <div id="vocabResult" class="result"></div>
+  </div>
+
+  <div id="flashcardTab" class="tabPanel">
+    <p class="small">Tap the card to flip between definition and term.</p>
+    <div class="question flashcard" id="flashcard" onclick="flipCard()"></div>
+    <button onclick="prevCard()">Previous</button>
+    <button onclick="flipCard()">Flip</button>
+    <button onclick="nextCard()">Next</button>
+    <button onclick="shuffleFlashcards()">Shuffle</button>
+    <div id="flashResult" class="result"></div>
+  </div>
+
+
+  <div id="timedMatchTab" class="tabPanel">
+    <p class="small">Click a vocabulary word and its matching definition. The board is 3 tall by 4 wide. New cards appear after matches until you clear all vocab words.</p>
+
+    <div class="matchGameControls">
+      <button onclick="startMatchGame()">Start New Game</button>
+      <div class="matchStat">Time: <span id="matchTime">0.0</span>s</div>
+      <div class="matchStat">Matches: <span id="matchScore">0</span>/<span id="matchTotal">0</span></div>
+      <div class="matchStat">Mistakes: <span id="matchMistakes">0</span></div>
+      <div class="matchStat">Best Time: <span id="matchBestTime">None yet</span></div>
+    </div>
+
+    <div class="feedback" id="matchMessage">Press Start New Game to begin.</div>
+    <div id="matchGrid" class="matchGrid"></div>
+  </div>
+
+  <div id="answerKeyTab" class="tabPanel">
+    <p class="small">Use this to check your understanding or study independently.</p>
+    <div style="overflow-x:auto;">
+      <table class="answerTable">
+        <thead>
+          <tr>
+            <th>Vocabulary Word</th>
+            <th>Definition</th>
+          </tr>
+        </thead>
+        <tbody id="answerKeyBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+
+<div class="card">
+  <h2>2. Policy Sort Game</h2>
+  <p class="small">Drag each card into the correct bucket. This helps with multiple choice questions about government action, inflation, jobs, and the Federal Reserve.</p>
+  <div id="sortTerms"></div>
+  <div class="grid">
+    <div class="dropzone" data-zone="Monetary Policy"><h3>Monetary Policy</h3></div>
+    <div class="dropzone" data-zone="Fiscal Policy"><h3>Fiscal Policy</h3></div>
+    <div class="dropzone" data-zone="Market Concept"><h3>Market Concept</h3></div>
+    <div class="dropzone" data-zone="Tax Concept"><h3>Tax Concept</h3></div>
+  </div>
+  <button onclick="checkSort()">Check Sort</button>
+  <button onclick="buildSort()">Reset Sort</button>
+  <div id="sortResult" class="result"></div>
+</div>
+
+<div class="card">
+  <h2>3. Multiple Choice Concept Trainer</h2>
+  <p class="small">These are not the exam questions. They practice the same concepts and the same kind of thinking.</p>
+  <div id="mcQuiz"></div>
+  <button onclick="checkMC()">Check Multiple Choice Practice</button>
+  <button onclick="buildMC()">New Attempt</button>
+  <div id="mcResult" class="result"></div>
+</div>
+
+<div class="card">
+  <h2>4. Cause and Effect Challenge</h2>
+  <p class="small">Choose the most likely effect. This practices the logic behind economics questions.</p>
+  <div id="causeQuiz"></div>
+  <button onclick="checkCause()">Check Cause and Effect</button>
+  <div id="causeResult" class="result"></div>
+</div>
+
+<div class="card">
+  <h2>5. Short Answer Practice Coach</h2>
+  <p class="small">Choose a prompt, write a 3 to 4 sentence answer, then use the checklist to self score it. The app will not grade your opinion. It checks whether you included the parts of a strong answer.</p>
+  <label for="promptSelect">Pick a practice theme:</label>
+  <select id="promptSelect" onchange="loadPrompt()"></select>
+  <div id="promptBox" class="feedback"></div>
+  <textarea id="shortAnswer" placeholder="Write your 3 to 4 sentence practice answer here..."></textarea>
+  <div class="grid">
+    <label class="item"><input type="checkbox" class="saCheck"> I used at least one economics vocabulary word.</label>
+    <label class="item"><input type="checkbox" class="saCheck"> I explained cause and effect.</label>
+    <label class="item"><input type="checkbox" class="saCheck"> I included a real world example or specific detail.</label>
+    <label class="item"><input type="checkbox" class="saCheck"> I considered fairness, tradeoffs, or consequences.</label>
+  </div>
+  <button onclick="scoreShortAnswer()">Check My Short Answer Prep</button>
+  <div id="saResult" class="result"></div>
+</div>
+
+<div class="card">
+  <h2>6. Final Confidence Check</h2>
+  <p>Use this before the test. Can you explain these without notes?</p>
+  <div class="grid">
+    <div class="item">Explain scarcity using a real example.</div>
+    <div class="item">Compare fiscal policy and monetary policy.</div>
+    <div class="item">Explain why some goods are inelastic.</div>
+    <div class="item">Explain how interest rates affect housing.</div>
+    <div class="item">Compare progressive and regressive taxes.</div>
+    <div class="item">Explain one positive and one negative externality.</div>
+  </div>
+</div>
+
+</div>
+
+<footer>Keep practicing. Confidence comes from reps.</footer>
+
+<script>
+const vocab = [
+ ["Not responsive to changes in price.","Inelastic"],
+ ["Limited resources with unlimited wants.","Scarcity"],
+ ["Legal entities separate from owners.","Corporations"],
+ ["Minimum price set above equilibrium.","Price floor"],
+ ["Single seller dominating a market.","Monopoly"],
+ ["Direct relationship between price and quantity supplied.","Law of supply"],
+ ["Comparing additional benefits and costs.","Marginal analysis"],
+ ["Motivations that influence behavior.","Incentives"],
+ ["Business owned by one person.","Sole proprietorship"],
+ ["Many buyers and sellers with identical products.","Perfect competition"],
+ ["Inverse relationship between price and quantity demanded.","Law of demand"],
+ ["The average economic output per person.","Per Capita GDP"],
+ ["The process by which the monetary authority of a country controls the supply of money, often targeting inflation and interest rates.","Monetary Policy"],
+ ["The use of government spending and taxation to influence the economy.","Fiscal Policy"],
+ ["The central bank of the United States, responsible for conducting monetary policy and regulating the banking system.","Federal Reserve"],
+ ["A tax that takes a larger percentage of income from high-income earners than from low-income earners.","Progressive Tax"],
+ ["A tax that takes a larger percentage of income from low-income earners than from high-income earners.","Regressive Tax"],
+ ["The total amount of money that a government has borrowed and not yet repaid.","National Debt"],
+ ["The state of being without any work, yet actively seeking employment.","Unemployment"],
+ ["A loan used to purchase real estate, typically with specified payment periods and interest rates.","Mortgage"],
+ ["The rate at which the general level of prices for goods and services is rising.","Inflation"],
+ ["The value of the next best alternative.","Opportunity costs"],
+ ["Responsive to changes in price.","Elastic"],
+ ["Supply and demand are balanced.","Equilibrium"]
+];
+
+const vocabOptions = [
+"Scarcity","Marginal analysis","Opportunity costs","Incentives","Corporations","Sole proprietorship","Barrier to entry","Public policy","Revenue","Price floor","Monopoly","Perfect competition","Law of demand","Law of supply","Outsourcing","Prices","Equilibrium","Elastic","Inelastic","Externalities","Federal Reserve","Monetary Policy","Fiscal Policy","National Debt","Unemployment","Labor Market","Interest Rate","Mortgage","Indicator","Inflation","Circular Flow","Regressive Tax","Progressive Tax","Income Tax","Tax Bracket","Federal Budget","GDP","Per Capita GDP"
+];
+
+
+let flashDeck=[];
+let flashIndex=0;
+let flashShowingAnswer=false;
+
+function showVocabTab(tabId, btn){
+  document.querySelectorAll(".tabPanel").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".tabButton").forEach(b=>b.classList.remove("active"));
+  document.getElementById(tabId).classList.add("active");
+  btn.classList.add("active");
+}
+
+function buildFlashcards(){
+  flashDeck=shuffle(vocab);
+  flashIndex=0;
+  flashShowingAnswer=false;
+  renderFlashcard();
+}
+
+function renderFlashcard(){
+  const card=document.getElementById("flashcard");
+  const pair=flashDeck[flashIndex];
+  if(!pair)return;
+  if(flashShowingAnswer){
+    card.innerHTML=`<div class="label">TERM</div><strong>${pair[1]}</strong>`;
+  }else{
+    card.innerHTML=`<div class="label">DEFINITION</div>${pair[0]}`;
+  }
+  document.getElementById("flashResult").innerHTML=`Card ${flashIndex+1} of ${flashDeck.length}`;
+}
+
+function flipCard(){
+  flashShowingAnswer=!flashShowingAnswer;
+  renderFlashcard();
+}
+
+function nextCard(){
+  flashIndex=(flashIndex+1)%flashDeck.length;
+  flashShowingAnswer=false;
+  renderFlashcard();
+}
+
+function prevCard(){
+  flashIndex=(flashIndex-1+flashDeck.length)%flashDeck.length;
+  flashShowingAnswer=false;
+  renderFlashcard();
+}
+
+function shuffleFlashcards(){
+  buildFlashcards();
+}
+
+function buildAnswerKey(){
+  const body=document.getElementById("answerKeyBody");
+  body.innerHTML="";
+  vocab.forEach(pair=>{
+    const row=document.createElement("tr");
+    row.innerHTML=`<td>${pair[1]}</td><td>${pair[0]}</td>`;
+    body.appendChild(row);
+  });
+}
+
+function shuffle(arr){return [...arr].sort(()=>Math.random()-.5)}
+
+function buildVocab(){
+  const box=document.getElementById("vocabQuiz");
+  box.innerHTML="";
+  shuffle(vocab).forEach((pair,i)=>{
+    const div=document.createElement("div");
+    div.className="question";
+    div.dataset.answer=pair[1];
+    div.innerHTML=`<strong>${i+1}.</strong> ${pair[0]}`;
+    const sel=document.createElement("select");
+    sel.innerHTML=`<option value="">Choose a term</option>`+vocabOptions.map(o=>`<option>${o}</option>`).join("");
+    div.appendChild(sel);
+    box.appendChild(div);
+  });
+}
+function checkVocab(){
+  let score=0, total=0;
+  document.querySelectorAll("#vocabQuiz .question").forEach(q=>{
+    total++;
+    q.classList.remove("correct","incorrect");
+    const right=q.dataset.answer;
+    const picked=q.querySelector("select").value;
+    if(picked===right){score++; q.classList.add("correct")}
+    else{q.classList.add("incorrect")}
+  });
+  document.getElementById("vocabResult").innerHTML=`You got ${score}/${total}. ${score===total?"Perfect vocab run.":"Green means correct. Red means review and retry."}`;
+}
+function resetVocab(){
+
+let matchTimer=null;
+let matchStartTime=0;
+let matchSelected=null;
+let matchDeck=[];
+let matchNextIndex=0;
+let matchScore=0;
+let matchMistakes=0;
+let matchTotal=0;
+
+function loadBestTime(){
+  const bestEl=document.getElementById("matchBestTime");
+  if(!bestEl)return;
+  const best=localStorage.getItem("econVocabMatchBestTime");
+  bestEl.textContent=best ? best+"s" : "None yet";
+}
+
+function startMatchGame(){
+  clearInterval(matchTimer);
+
+  matchSelected=null;
+  matchDeck=shuffle(vocab);
+  matchNextIndex=0;
+  matchScore=0;
+  matchMistakes=0;
+  matchTotal=matchDeck.length;
+
+  document.getElementById("matchScore").textContent=matchScore;
+  document.getElementById("matchTotal").textContent=matchTotal;
+  document.getElementById("matchMistakes").textContent=matchMistakes;
+  document.getElementById("matchTime").textContent="0.0";
+  document.getElementById("matchMessage").innerHTML="Match the word cards to the definition cards. The board refills until all vocab is cleared.";
+
+  const grid=document.getElementById("matchGrid");
+  grid.innerHTML="";
+
+  for(let i=0;i<6;i++){
+    addNextPairToBoard();
+  }
+
+  shuffleBoardCards();
+
+  matchStartTime=Date.now();
+  matchTimer=setInterval(()=>{
+    document.getElementById("matchTime").textContent=((Date.now()-matchStartTime)/1000).toFixed(1);
+  },100);
+}
+
+function addNextPairToBoard(){
+  if(matchNextIndex>=matchDeck.length)return;
+
+  const pair=matchDeck[matchNextIndex];
+  const pairId="econ-pair-"+matchNextIndex;
+  matchNextIndex++;
+
+  createMatchCard(pairId,"WORD",pair[1]);
+  createMatchCard(pairId,"DEFINITION",pair[0]);
+}
+
+function createMatchCard(pairId,type,text){
+  const grid=document.getElementById("matchGrid");
+  const card=document.createElement("div");
+  card.className="matchCardGame";
+  card.dataset.id=pairId;
+  card.dataset.type=type;
+  card.innerHTML=`<div><span class="matchType">${type}</span>${text}</div>`;
+  card.addEventListener("click",()=>selectMatchCard(card));
+  grid.appendChild(card);
+}
+
+function shuffleBoardCards(){
+  const grid=document.getElementById("matchGrid");
+  const cards=[...grid.children];
+  shuffle(cards).forEach(card=>grid.appendChild(card));
+}
+
+function selectMatchCard(card){
+  if(card.classList.contains("matched"))return;
+
+  if(!matchSelected){
+    matchSelected=card;
+    card.classList.add("selected");
+    return;
+  }
+
+  if(matchSelected===card){
+    card.classList.remove("selected");
+    matchSelected=null;
+    return;
+  }
+
+  const isMatch=matchSelected.dataset.id===card.dataset.id && matchSelected.dataset.type!==card.dataset.type;
+
+  if(isMatch){
+    const first=matchSelected;
+    const second=card;
+
+    first.classList.remove("selected");
+    first.classList.add("matched");
+    second.classList.add("matched");
+    matchSelected=null;
+
+    matchScore++;
+    document.getElementById("matchScore").textContent=matchScore;
+
+    setTimeout(()=>{
+      first.remove();
+      second.remove();
+
+      addNextPairToBoard();
+      shuffleBoardCards();
+
+      if(matchScore===matchTotal){
+        endMatchGame();
+      }
+    },250);
+  }else{
+    matchMistakes++;
+    document.getElementById("matchMistakes").textContent=matchMistakes;
+
+    const first=matchSelected;
+    first.classList.add("wrong");
+    card.classList.add("wrong");
+
+    setTimeout(()=>{
+      first.classList.remove("selected","wrong");
+      card.classList.remove("wrong");
+      matchSelected=null;
+    },350);
+  }
+}
+
+function endMatchGame(){
+  clearInterval(matchTimer);
+
+  const elapsed=((Date.now()-matchStartTime)/1000).toFixed(1);
+  const oldBest=localStorage.getItem("econVocabMatchBestTime");
+
+  let message=`🎉 You cleared all ${matchTotal} vocab matches in ${elapsed}s with ${matchMistakes} mistakes.`;
+
+  if(!oldBest || parseFloat(elapsed)<parseFloat(oldBest)){
+    localStorage.setItem("econVocabMatchBestTime",elapsed);
+    message+=" New best time!";
+  }else{
+    message+=` Best time to beat: ${oldBest}s.`;
+  }
+
+  document.getElementById("matchMessage").innerHTML=message;
+  loadBestTime();
+}
+
+buildVocab();document.getElementById("vocabResult").innerHTML="";}
+
+const sortCards=[
+ ["Federal Reserve changes interest rates","Monetary Policy"],
+ ["Government increases spending on roads","Fiscal Policy"],
+ ["Congress changes tax rates","Fiscal Policy"],
+ ["Money supply is controlled","Monetary Policy"],
+ ["Progressive tax","Tax Concept"],
+ ["Regressive tax","Tax Concept"],
+ ["Demand rises but supply stays low","Market Concept"],
+ ["A price floor is set","Market Concept"],
+ ["Inflation is targeted by central bank","Monetary Policy"],
+ ["Social welfare program spending","Fiscal Policy"],
+ ["Equilibrium price","Market Concept"],
+ ["Tax bracket","Tax Concept"]
+];
+
+function buildSort(){
+  document.getElementById("sortResult").innerHTML="";
+  document.querySelectorAll(".dropzone").forEach(z=>z.querySelectorAll(".termchip").forEach(c=>c.remove()));
+  const area=document.getElementById("sortTerms");
+  area.innerHTML="<h3>Cards to Sort</h3>";
+  shuffle(sortCards).forEach(([text,cat])=>{
+    const chip=document.createElement("div");
+    chip.className="termchip";
+    chip.draggable=true;
+    chip.textContent=text;
+    chip.dataset.cat=cat;
+    chip.addEventListener("dragstart",e=>e.dataTransfer.setData("text/plain",text+"||"+cat));
+    area.appendChild(chip);
+  });
+}
+document.addEventListener("dragover",e=>{if(e.target.closest(".dropzone")||e.target.id==="sortTerms") e.preventDefault();});
+document.addEventListener("drop",e=>{
+  const zone=e.target.closest(".dropzone") || (e.target.id==="sortTerms"?e.target:null);
+  if(!zone)return;
+  e.preventDefault();
+  const data=e.dataTransfer.getData("text/plain").split("||");
+  const existing=[...document.querySelectorAll(".termchip")].find(c=>c.textContent===data[0]);
+  if(existing) zone.appendChild(existing);
+});
+function checkSort(){
+  let score=0,total=sortCards.length;
+  document.querySelectorAll(".termchip").forEach(c=>c.classList.remove("correct","incorrect"));
+  document.querySelectorAll(".dropzone .termchip").forEach(c=>{
+    const zone=c.closest(".dropzone").dataset.zone;
+    if(zone===c.dataset.cat){score++; c.classList.add("correct")}
+    else c.classList.add("incorrect");
+  });
+  document.getElementById("sortResult").innerHTML=`Sorted correctly: ${score}/${total}. Move the red cards and check again.`;
+}
+
+const mc = [
+ {q:"A product is usually inelastic when...", a:"People need it and there are few substitutes.", choices:["People need it and there are few substitutes.","It has many fun alternatives.","Its price never changes.","It is always a luxury item."]},
+ {q:"A progressive tax is usually defended as fair because...", a:"People with higher incomes pay a larger percentage.", choices:["Everyone pays the same dollar amount.","Lower income people pay a larger percentage.","People with higher incomes pay a larger percentage.","No one pays taxes."]},
+ {q:"Lower interest rates can affect housing because...", a:"Borrowing becomes cheaper, which can increase demand for homes.", choices:["Borrowing becomes cheaper, which can increase demand for homes.","Borrowing becomes impossible.","Supply always disappears.","Taxes automatically increase."]},
+ {q:"Fiscal policy is different from monetary policy because fiscal policy involves...", a:"Government spending and taxation.", choices:["Only the Federal Reserve.","Government spending and taxation.","Only private businesses.","Only supply and demand."]},
+ {q:"A negative externality happens when...", a:"A cost affects people who were not part of the original transaction.", choices:["Everyone benefits equally.","A cost affects people who were not part of the original transaction.","Prices are always low.","A business has no costs."]},
+ {q:"A monopoly can be a problem because...", a:"One seller may have too much control over price and choice.", choices:["There are too many sellers.","One seller may have too much control over price and choice.","All products are identical.","Consumers set every price."]}
+];
+
+function buildMC(){
+  const box=document.getElementById("mcQuiz");
+  box.innerHTML="";
+  shuffle(mc).forEach((m,i)=>{
+    const div=document.createElement("div");
+    div.className="question";
+    div.dataset.answer=m.a;
+    div.innerHTML=`<strong>${i+1}.</strong> ${m.q}`;
+    shuffle(m.choices).forEach(ch=>{
+      div.innerHTML+=`<label class="item" style="display:block;margin-top:8px;"><input type="radio" name="mc${i}" value="${ch}"> ${ch}</label>`;
+    });
+    box.appendChild(div);
+  });
+  document.getElementById("mcResult").innerHTML="";
+}
+function checkMC(){
+  let score=0,total=0;
+  document.querySelectorAll("#mcQuiz .question").forEach(q=>{
+    total++;
+    q.classList.remove("correct","incorrect");
+    const picked=q.querySelector("input:checked");
+    if(picked && picked.value===q.dataset.answer){score++; q.classList.add("correct")}
+    else q.classList.add("incorrect");
+  });
+  document.getElementById("mcResult").innerHTML=`You got ${score}/${total}. Read the red ones and ask: Which answer best matches the economic concept?`;
+}
+
+const causes=[
+ {q:"If demand rises faster than supply, prices usually...", a:"increase", choices:["increase","drop to zero","become unrelated to scarcity","stay exactly the same"]},
+ {q:"If interest rates rise, borrowing usually becomes...", a:"more expensive", choices:["free","more expensive","unlimited","unrelated to homes"]},
+ {q:"If a good has no close substitutes and is necessary, demand is likely...", a:"inelastic", choices:["inelastic","perfect competition","a tax bracket","outsourced"]},
+ {q:"If the government spends more than it earns over time, national debt may...", a:"increase", choices:["increase","disappear immediately","become GDP","turn into supply"]},
+ {q:"If a market has many sellers with identical products, it is closer to...", a:"perfect competition", choices:["perfect competition","monopoly","scarcity ending","a mortgage"]}
+];
+function buildCause(){
+  const box=document.getElementById("causeQuiz");
+  box.innerHTML="";
+  causes.forEach((c,i)=>{
+    const div=document.createElement("div");
+    div.className="question";
+    div.dataset.answer=c.a;
+    div.innerHTML=`<strong>${i+1}.</strong> ${c.q}`;
+    const sel=document.createElement("select");
+    sel.innerHTML="<option value=''>Choose the likely effect</option>"+shuffle(c.choices).map(x=>`<option>${x}</option>`).join("");
+    div.appendChild(sel);
+    box.appendChild(div);
+  });
+}
+function checkCause(){
+  let score=0,total=0;
+  document.querySelectorAll("#causeQuiz .question").forEach(q=>{
+    total++;
+    q.classList.remove("correct","incorrect");
+    const val=q.querySelector("select").value;
+    if(val===q.dataset.answer){score++; q.classList.add("correct")}
+    else q.classList.add("incorrect");
+  });
+  document.getElementById("causeResult").innerHTML=`Cause and effect score: ${score}/${total}.`;
+}
+
+const prompts=[
+ ["Healthcare Scarcity","Explain how a society might decide how to allocate scarce medical resources. Consider fairness, need, costs, and ethics."],
+ ["Households, Businesses, and Government","Explain how households, businesses, and government influence each other during inflation."],
+ ["Fast Fashion","Explain how supply and demand affect prices in fast fashion and what ethical issues can result."],
+ ["Market Failures","Explain why government might intervene during a market failure such as a pandemic. Include externalities."],
+ ["Taxes and Equity","Explain how taxes can affect income inequality and social welfare programs."]
+];
+function loadPrompt(){
+  const idx=document.getElementById("promptSelect").value;
+  document.getElementById("promptBox").innerHTML="<strong>"+prompts[idx][0]+":</strong> "+prompts[idx][1];
+}
+function buildPrompts(){
+  const sel=document.getElementById("promptSelect");
+  sel.innerHTML=prompts.map((p,i)=>`<option value="${i}">${p[0]}</option>`).join("");
+  loadPrompt();
+}
+function scoreShortAnswer(){
+  const text=document.getElementById("shortAnswer").value.trim();
+  const sentences=(text.match(/[.!?]+/g)||[]).length;
+  const checks=[...document.querySelectorAll(".saCheck")].filter(c=>c.checked).length;
+  let msg=`Checklist: ${checks}/4. Sentence count estimate: ${sentences}. `;
+  if(sentences>=3 && sentences<=5 && checks>=3) msg+="Strong practice answer. You are aiming for exam ready.";
+  else if(sentences<3) msg+="Add more explanation. Aim for 3 to 4 complete sentences.";
+  else msg+="Good start. Add vocabulary, cause and effect, and a specific example.";
+  document.getElementById("saResult").innerHTML=msg;
+}
+
+
+buildVocab();
+buildFlashcards();
+buildAnswerKey();
+loadBestTime();
+buildSort();
+buildMC();
+buildCause();
+buildPrompts();
+</script>
+</body>
+</html>
