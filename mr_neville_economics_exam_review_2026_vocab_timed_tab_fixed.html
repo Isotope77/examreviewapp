@@ -229,6 +229,11 @@ footer{text-align:center;color:var(--soft);padding:28px}
 }
 .matchCardGame{
   min-height:92px;
+  width:100%;
+  margin:0;
+  color:var(--white);
+  font:inherit;
+  font-weight:bold;
   background:rgba(255,255,255,.10);
   border:2px solid rgba(255,210,31,.35);
   border-radius:16px;
@@ -325,7 +330,7 @@ footer{text-align:center;color:var(--soft);padding:28px}
 
 
   <div id="timedMatchTab" class="tabPanel">
-    <p class="small">Click a vocabulary word and its matching definition. The board is 3 tall by 4 wide. New cards appear after matches until you clear all vocab words.</p>
+    <p class="small">Click a vocabulary word and its matching definition. The board is 3 tall by 4 wide. New cards appear after matches until you clear all 20 game words.</p>
 
     <div class="matchGameControls">
       <button onclick="startMatchGame()">Start New Game</button>
@@ -546,6 +551,13 @@ function checkVocab(){
   document.getElementById("vocabResult").innerHTML=`You got ${score}/${total}. ${score===total?"Perfect vocab run.":"Green means correct. Red means review and retry."}`;
 }
 function resetVocab(){
+  buildVocab();
+  document.getElementById("vocabResult").innerHTML="";
+}
+
+const MATCH_PAIR_COUNT=20;
+const MATCH_BOARD_PAIR_COUNT=6;
+const MATCH_BEST_TIME_KEY="econVocabMatchBestTime";
 
 let matchTimer=null;
 let matchStartTime=0;
@@ -554,44 +566,57 @@ let matchDeck=[];
 let matchNextIndex=0;
 let matchScore=0;
 let matchMistakes=0;
-let matchTotal=0;
+let matchTotal=Math.min(MATCH_PAIR_COUNT,vocab.length);
+let matchGameActive=false;
+
+function escapeHTML(text){
+  const div=document.createElement("div");
+  div.textContent=text;
+  return div.innerHTML;
+}
 
 function loadBestTime(){
   const bestEl=document.getElementById("matchBestTime");
   if(!bestEl)return;
-  const best=localStorage.getItem("econVocabMatchBestTime");
+  const best=localStorage.getItem(MATCH_BEST_TIME_KEY);
   bestEl.textContent=best ? best+"s" : "None yet";
+  const totalEl=document.getElementById("matchTotal");
+  if(totalEl)totalEl.textContent=matchTotal;
 }
 
 function startMatchGame(){
   clearInterval(matchTimer);
 
   matchSelected=null;
-  matchDeck=shuffle(vocab);
+  matchDeck=shuffle(vocab).slice(0,matchTotal);
   matchNextIndex=0;
   matchScore=0;
   matchMistakes=0;
-  matchTotal=matchDeck.length;
+  matchGameActive=true;
 
   document.getElementById("matchScore").textContent=matchScore;
   document.getElementById("matchTotal").textContent=matchTotal;
   document.getElementById("matchMistakes").textContent=matchMistakes;
   document.getElementById("matchTime").textContent="0.0";
-  document.getElementById("matchMessage").innerHTML="Match the word cards to the definition cards. The board refills until all vocab is cleared.";
+  document.getElementById("matchMessage").innerHTML=`Match all ${matchTotal} word-definition pairs. A correct pair disappears and a new pair joins the board.`;
 
   const grid=document.getElementById("matchGrid");
   grid.innerHTML="";
 
-  for(let i=0;i<6;i++){
+  for(let i=0;i<MATCH_BOARD_PAIR_COUNT;i++){
     addNextPairToBoard();
   }
 
   shuffleBoardCards();
 
   matchStartTime=Date.now();
-  matchTimer=setInterval(()=>{
-    document.getElementById("matchTime").textContent=((Date.now()-matchStartTime)/1000).toFixed(1);
-  },100);
+  matchTimer=setInterval(updateMatchTimer,100);
+  updateMatchTimer();
+}
+
+function updateMatchTimer(){
+  if(!matchGameActive)return;
+  document.getElementById("matchTime").textContent=((Date.now()-matchStartTime)/1000).toFixed(1);
 }
 
 function addNextPairToBoard(){
@@ -607,11 +632,12 @@ function addNextPairToBoard(){
 
 function createMatchCard(pairId,type,text){
   const grid=document.getElementById("matchGrid");
-  const card=document.createElement("div");
+  const card=document.createElement("button");
+  card.type="button";
   card.className="matchCardGame";
   card.dataset.id=pairId;
   card.dataset.type=type;
-  card.innerHTML=`<div><span class="matchType">${type}</span>${text}</div>`;
+  card.innerHTML=`<span><span class="matchType">${type}</span>${escapeHTML(text)}</span>`;
   card.addEventListener("click",()=>selectMatchCard(card));
   grid.appendChild(card);
 }
@@ -623,71 +649,87 @@ function shuffleBoardCards(){
 }
 
 function selectMatchCard(card){
-  if(card.classList.contains("matched"))return;
+  if(!matchGameActive || card.classList.contains("matched"))return;
 
   if(!matchSelected){
     matchSelected=card;
     card.classList.add("selected");
+    document.getElementById("matchMessage").innerHTML="Now choose its matching "+(card.dataset.type==="WORD" ? "definition." : "word.");
     return;
   }
 
   if(matchSelected===card){
     card.classList.remove("selected");
     matchSelected=null;
+    document.getElementById("matchMessage").innerHTML="Selection cleared. Choose any word or definition to keep matching.";
     return;
   }
 
   const isMatch=matchSelected.dataset.id===card.dataset.id && matchSelected.dataset.type!==card.dataset.type;
 
   if(isMatch){
-    const first=matchSelected;
-    const second=card;
-
-    first.classList.remove("selected");
-    first.classList.add("matched");
-    second.classList.add("matched");
-    matchSelected=null;
-
-    matchScore++;
-    document.getElementById("matchScore").textContent=matchScore;
-
-    setTimeout(()=>{
-      first.remove();
-      second.remove();
-
-      addNextPairToBoard();
-      shuffleBoardCards();
-
-      if(matchScore===matchTotal){
-        endMatchGame();
-      }
-    },250);
+    handleCorrectMatch(card);
   }else{
-    matchMistakes++;
-    document.getElementById("matchMistakes").textContent=matchMistakes;
-
-    const first=matchSelected;
-    first.classList.add("wrong");
-    card.classList.add("wrong");
-
-    setTimeout(()=>{
-      first.classList.remove("selected","wrong");
-      card.classList.remove("wrong");
-      matchSelected=null;
-    },350);
+    handleIncorrectMatch(card);
   }
+}
+
+function handleCorrectMatch(card){
+  const first=matchSelected;
+  const second=card;
+
+  first.classList.remove("selected");
+  first.classList.add("matched");
+  second.classList.add("matched");
+  first.disabled=true;
+  second.disabled=true;
+  matchSelected=null;
+
+  matchScore++;
+  document.getElementById("matchScore").textContent=matchScore;
+  document.getElementById("matchMessage").innerHTML=`Correct! ${matchTotal-matchScore} pairs left.`;
+
+  setTimeout(()=>{
+    first.remove();
+    second.remove();
+
+    addNextPairToBoard();
+    shuffleBoardCards();
+
+    if(matchScore===matchTotal){
+      endMatchGame();
+    }
+  },250);
+}
+
+function handleIncorrectMatch(card){
+  matchMistakes++;
+  document.getElementById("matchMistakes").textContent=matchMistakes;
+  document.getElementById("matchMessage").innerHTML="Not a match. Try a different word-definition pair.";
+
+  const first=matchSelected;
+  first.classList.add("wrong");
+  card.classList.add("wrong");
+
+  setTimeout(()=>{
+    first.classList.remove("selected","wrong");
+    card.classList.remove("wrong");
+    matchSelected=null;
+  },350);
 }
 
 function endMatchGame(){
   clearInterval(matchTimer);
+  matchGameActive=false;
 
   const elapsed=((Date.now()-matchStartTime)/1000).toFixed(1);
-  const oldBest=localStorage.getItem("econVocabMatchBestTime");
+  document.getElementById("matchTime").textContent=elapsed;
+  const oldBest=localStorage.getItem(MATCH_BEST_TIME_KEY);
 
   let message=`🎉 You cleared all ${matchTotal} vocab matches in ${elapsed}s with ${matchMistakes} mistakes.`;
 
   if(!oldBest || parseFloat(elapsed)<parseFloat(oldBest)){
-    localStorage.setItem("econVocabMatchBestTime",elapsed);
+    localStorage.setItem(MATCH_BEST_TIME_KEY,elapsed);
     message+=" New best time!";
   }else{
     message+=` Best time to beat: ${oldBest}s.`;
@@ -697,7 +739,6 @@ function endMatchGame(){
   loadBestTime();
 }
 
-buildVocab();document.getElementById("vocabResult").innerHTML="";}
 
 const sortCards=[
  ["Federal Reserve changes interest rates","Monetary Policy"],
