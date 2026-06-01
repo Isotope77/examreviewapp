@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mr. Neville's Government Exam Review 2026</title>
+<style>
+:root{
+  --navy:#071b3f;
+  --navy2:#0d2d63;
+  --yellow:#ffd21f;
+  --yellow2:#fff2a8;
+  --white:#f7fbff;
+  --soft:#d8e6ff;
+  --card:rgba(255,255,255,.10);
+  --good:#77e28b;
+  --bad:#ff8d8d;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial, Helvetica, sans-serif;
+  background:radial-gradient(circle at top left,#174487,#071b3f 58%);
+  color:var(--white);
+}
+header{
+  padding:28px 18px;
+  text-align:center;
+  background:rgba(0,0,0,.25);
+  border-bottom:6px solid var(--yellow);
+}
+h1{margin:0;color:var(--yellow);font-size:2.25rem}
+.subtitle{color:var(--soft);margin-top:8px;font-size:1.05rem}
+.container{max-width:1150px;margin:auto;padding:22px}
+.card{
+  background:var(--card);
+  border:2px solid rgba(255,210,31,.28);
+  border-radius:20px;
+  padding:22px;
+  margin:0 0 22px;
+  box-shadow:0 8px 24px rgba(0,0,0,.25);
+}
+h2{color:var(--yellow);margin-top:0}
+h3{margin-bottom:8px;color:var(--yellow2)}
+button{
+  background:var(--yellow);
+  color:var(--navy);
+  border:0;
+  border-radius:14px;
+  padding:12px 16px;
+  font-weight:800;
+  cursor:pointer;
+  margin:6px 6px 6px 0;
+  font-size:.98rem;
+}
+button:hover{filter:brightness(1.06);transform:translateY(-1px)}
+select,textarea{
+  width:100%;
+  padding:10px;
+  border:0;
+  border-radius:12px;
+  font-size:1rem;
+  margin-top:8px;
+}
+textarea{min-height:105px;resize:vertical}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px}
+.item,.question,.dropzone,.termchip{
+  background:rgba(255,255,255,.10);
+  padding:14px;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.15);
+}
+.termchip{
+  display:inline-block;
+  margin:5px;
+  cursor:grab;
+  border:2px solid rgba(255,210,31,.35);
+}
+.termchip.selected{
+  outline:3px solid var(--yellow);
+  background:rgba(255,210,31,.24);
+}
+.dropzone{
+  min-height:85px;
+  border:2px dashed rgba(255,210,31,.55);
+}
+.correct{outline:3px solid var(--good)}
+.incorrect{outline:3px solid var(--bad)}
+.result{font-weight:800;margin-top:12px;font-size:1.1rem}
+.small{font-size:.92rem;color:var(--soft)}
+.progress{
+  background:rgba(255,255,255,.13);
+  border-radius:999px;
+  overflow:hidden;
+  height:18px;
+  margin-top:10px;
+}
+.bar{height:18px;background:var(--yellow);width:0%;transition:.3s}
+.badge{
+  display:inline-block;
+  background:rgba(255,210,31,.18);
+  border:1px solid rgba(255,210,31,.35);
+  color:var(--yellow2);
+  border-radius:999px;
+  padding:6px 10px;
+  margin:4px;
+}
+.feedback{
+  background:rgba(0,0,0,.18);
+  border-left:6px solid var(--yellow);
+  padding:12px;
+  border-radius:12px;
+  margin-top:10px;
+}
+footer{text-align:center;color:var(--soft);padding:28px}
+
+.vocabTabs{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:14px;
+}
+.tabButton{
+  width:auto;
+  margin:4px 4px 8px 0;
+  background:rgba(255,210,31,.18);
+  color:var(--yellow2);
+  border:1px solid rgba(255,210,31,.45);
+}
+.tabButton.active{
+  background:var(--yellow);
+  color:var(--navy);
+}
+.tabPanel{display:none}
+.tabPanel.active{display:block}
+.flashcard{
+  min-height:280px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  text-align:center;
+  font-size:1.35rem;
+  line-height:1.45;
+  cursor:pointer;
+  padding:26px;
+}
+.flashcard strong{
+  font-size:2.5rem;
+  line-height:1.15;
+  color:var(--yellow2);
+}
+.flashcard .label{
+  color:var(--yellow2);
+  font-size:.95rem;
+  margin-bottom:14px;
+}
+.answerTable{
+  width:100%;
+  border-collapse:collapse;
+}
+.answerTable th,
+.answerTable td{
+  padding:12px;
+  text-align:left;
+  border-bottom:1px solid rgba(255,255,255,.14);
+  vertical-align:top;
+}
+.answerTable th{
+  background:rgba(255,210,31,.18);
+  color:var(--yellow2);
+}
+.answerTable td:first-child{
+  font-weight:bold;
+  color:var(--yellow2);
+}
+
+.mcChoice{
+  display:flex;
+  flex-direction:row;
+  align-items:flex-start;
+  justify-content:flex-start;
+  gap:10px;
+  margin-top:8px;
+  text-align:left;
+  width:100%;
+}
+.question input[type="checkbox"]{width:auto;margin-right:8px;}
+.mcChoice input[type="radio"]{
+  width:auto;
+  flex:0 0 auto;
+  margin:3px 0 0 0;
+  padding:0;
+}
+.mcChoice span{
+  display:block;
+  flex:1;
+  text-align:left;
+}
+
+.matchGameControls{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  align-items:center;
+  margin:14px 0;
+}
+.matchStat{
+  background:rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:14px;
+  padding:10px 14px;
+  font-weight:bold;
+}
+.matchGrid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  grid-template-rows:repeat(3,minmax(105px,auto));
+  gap:12px;
+  margin-top:14px;
+}
+.matchCardGame{
+  min-height:92px;
+  width:100%;
+  margin:0;
+  color:var(--white);
+  font:inherit;
+  font-weight:bold;
+  background:rgba(255,255,255,.10);
+  border:2px solid rgba(255,210,31,.35);
+  border-radius:16px;
+  padding:12px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  line-height:1.25;
+  transition:.15s;
+}
+.matchCardGame:hover{
+  transform:translateY(-2px);
+  background:rgba(255,255,255,.15);
+}
+.matchCardGame.selected{
+  outline:4px solid var(--yellow);
+  background:rgba(255,210,31,.22);
+}
+.matchCardGame.matched{
+  background:rgba(119,226,139,.22);
+  border-color:var(--good);
+  color:#dfffe5;
+  cursor:default;
+  opacity:.72;
+}
+.matchCardGame.wrong{
+  animation:shake .25s;
+  border-color:var(--bad);
+}
+.matchType{
+  display:block;
+  color:var(--yellow2);
+  font-size:.78rem;
+  margin-bottom:6px;
+  font-weight:bold;
+}
+@keyframes shake{
+  0%{transform:translateX(0)}
+  25%{transform:translateX(-5px)}
+  50%{transform:translateX(5px)}
+  75%{transform:translateX(-3px)}
+  100%{transform:translateX(0)}
+}
+
+@media (max-width:700px){
+  header{
+    padding:20px 12px;
+    position:sticky;
+    top:0;
+    z-index:10;
+  }
+  h1{
+    font-size:1.45rem;
+    line-height:1.2;
+  }
+  .subtitle{font-size:.9rem}
+  .container{padding:12px}
+  .card{
+    padding:16px;
+    border-radius:16px;
+    margin-bottom:16px;
+  }
+  h2{font-size:1.25rem}
+  h3{font-size:1.05rem}
+  .grid{grid-template-columns:1fr;gap:10px}
+  .item,.question,.dropzone,.termchip{
+    padding:12px;
+    border-radius:14px;
+    font-size:.96rem;
+  }
+  .termchip{
+    display:block;
+    width:100%;
+    margin:8px 0;
+    cursor:pointer;
+  }
+  button{
+    width:100%;
+    margin:8px 0;
+    padding:14px;
+    font-size:1rem;
+  }
+  select,textarea{
+    font-size:16px;
+    padding:13px;
+  }
+  textarea{min-height:135px}
+  .mcChoice{
+    padding:13px;
+    gap:12px;
+  }
+  .mcChoice input[type="radio"]{
+    transform:scale(1.25);
+    margin-top:4px;
+  }
+  .flashcard{
+    min-height:310px;
+    font-size:1.45rem;
+  }
+  .flashcard strong{font-size:2.7rem}
+  .badge{
+    display:block;
+    text-align:center;
+    margin:7px 0;
+  }
+  .dropzone{min-height:105px}
+  .dropzone:after{
+    content:"Tap a card, then tap this box";
+    display:block;
+    color:var(--soft);
+    font-size:.8rem;
+    margin-top:8px;
+  }
+  .tabButton{width:100%}
+  .matchGrid{grid-template-columns:repeat(2,1fr);grid-template-rows:auto}
+  footer{
+    padding:20px 12px;
+    font-size:.9rem;
+  }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Mr. Neville's Government Exam Review 2026</h1>
+  <div class="subtitle">Practice civics vocabulary, concepts, short answers, and exam confidence.</div>
+</header>
+
+<div class="container">
+
+<div class="card">
+  <h2>🌟 Exam Mindset</h2>
+  <p>Government questions usually ask you to connect ideas: power, rights, citizens, branches, elections, courts, and policy. Read carefully, look for the concept being tested, and choose the best answer.</p>
+  <span class="badge">Use civics vocabulary</span>
+  <span class="badge">Explain power</span>
+  <span class="badge">Connect rights and duties</span>
+  <span class="badge">Give examples</span>
+</div>
+
+<div class="card">
+  <h2>1. Vocabulary Practice</h2>
+  <p class="small">These definitions match the exam wording. Choose the review style that works best for you.</p>
+
+  <div class="vocabTabs">
+    <button class="tabButton active" onclick="showVocabTab('dropdownTab', this)">Dropdown Match</button>
+    <button class="tabButton" onclick="showVocabTab('flashcardTab', this)">Flashcards</button>
+    <button class="tabButton" onclick="showVocabTab('timedMatchTab', this)">Timed Match</button>
+    <button class="tabButton" onclick="showVocabTab('answerKeyTab', this)">Answer Key</button>
+  </div>
+
+  <div id="dropdownTab" class="tabPanel active">
+    <p class="small">Pick the best term for each definition, then check your score.</p>
+    <div id="vocabQuiz"></div>
+    <button onclick="checkVocab()">Check Vocabulary</button>
+    <button onclick="resetVocab()">Reset</button>
+    <div id="vocabResult" class="result"></div>
+  </div>
+
+  <div id="flashcardTab" class="tabPanel">
+    <p class="small">Tap the card to flip between definition and term.</p>
+    <div class="question flashcard" id="flashcard" onclick="flipCard()"></div>
+    <button onclick="prevCard()">Previous</button>
+    <button onclick="flipCard()">Flip</button>
+    <button onclick="nextCard()">Next</button>
+    <button onclick="shuffleFlashcards()">Shuffle</button>
+    <div id="flashResult" class="result"></div>
+  </div>
+
+  <div id="timedMatchTab" class="tabPanel">
+    <p class="small">Click a vocabulary word and its matching definition. The board is 3 tall by 4 wide. New cards appear after matches until you clear all 20 government words.</p>
+
+    <div class="matchGameControls">
+      <button onclick="startMatchGame()">Start New Game</button>
+      <div class="matchStat">Time: <span id="matchTime">0.0</span>s</div>
+      <div class="matchStat">Matches: <span id="matchScore">0</span>/<span id="matchTotal">0</span></div>
+      <div class="matchStat">Mistakes: <span id="matchMistakes">0</span></div>
+      <div class="matchStat">Best Time: <span id="matchBestTime">None yet</span></div>
+    </div>
+
+    <div class="feedback" id="matchMessage">Press Start New Game to begin.</div>
+    <div id="matchGrid" class="matchGrid"></div>
+  </div>
+
+  <div id="answerKeyTab" class="tabPanel">
+    <p class="small">Use this to check your understanding or study independently.</p>
+    <div style="overflow-x:auto;">
+      <table class="answerTable">
+        <thead>
+          <tr>
+            <th>Vocabulary Word</th>
+            <th>Definition</th>
+          </tr>
+        </thead>
+        <tbody id="answerKeyBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<div class="card">
+  <h2>2. Civics Concept Sort Game</h2>
+  <p class="small">Drag each card into the correct bucket. On a phone, tap a card and then tap the bucket. This helps you review the big topics behind the multiple choice section.</p>
+  <div id="sortTerms"></div>
+  <div class="grid">
+    <div class="dropzone" data-zone="Branches &amp; Powers"><h3>Branches &amp; Powers</h3></div>
+    <div class="dropzone" data-zone="Citizens &amp; Elections"><h3>Citizens &amp; Elections</h3></div>
+    <div class="dropzone" data-zone="Law &amp; Courts"><h3>Law &amp; Courts</h3></div>
+    <div class="dropzone" data-zone="Policy &amp; Global Issues"><h3>Policy &amp; Global Issues</h3></div>
+  </div>
+  <button onclick="checkSort()">Check Sort</button>
+  <button onclick="buildSort()">Reset Sort</button>
+  <div id="sortResult" class="result"></div>
+</div>
+
+<div class="card">
+  <h2>3. Multiple Choice Concept Trainer</h2>
+  <div class="feedback">Read the question carefully and choose the BEST answer. These are practice concepts that match the style of thinking on the exam.</div>
+  <div class="progress"><div class="bar" id="mcBar"></div></div>
+  <div style="margin-top:18px;" id="mcQuiz"></div>
+  <div style="margin-top:18px;">
+    <button onclick="checkMC()">Check My Answers</button>
+    <button onclick="buildMC()">Try New Questions</button>
+  </div>
+  <div id="mcResult" class="result"></div>
+</div>
+
+<div class="card">
+  <h2>4. Cause and Effect Challenge</h2>
+  <p class="small">Choose the most likely effect. This practices the logic behind government and civics questions.</p>
+  <div id="causeQuiz"></div>
+  <button onclick="checkCause()">Check Cause and Effect</button>
+  <div id="causeResult" class="result"></div>
+</div>
+
+<div class="card">
+  <h2>5. Short Answer Practice Coach</h2>
+  <p class="small">Choose a prompt, write a 3 to 5 sentence answer, then use the checklist to self score it.</p>
+  <label for="promptSelect">Pick a practice theme:</label>
+  <select id="promptSelect" onchange="loadPrompt()"></select>
+  <div id="promptBox" class="feedback"></div>
+  <textarea id="shortAnswer" placeholder="Write your 3 to 5 sentence practice answer here..."></textarea>
+  <div class="grid">
+    <label class="item"><input type="checkbox" class="saCheck"> I used at least one government vocabulary word.</label>
+    <label class="item"><input type="checkbox" class="saCheck"> I explained how power, rights, or policy is affected.</label>
+    <label class="item"><input type="checkbox" class="saCheck"> I included a real example or specific detail.</label>
+    <label class="item"><input type="checkbox" class="saCheck"> I explained why the idea matters for citizens or government.</label>
+  </div>
+  <button onclick="scoreShortAnswer()">Check My Short Answer Prep</button>
+  <div id="saResult" class="result"></div>
+</div>
+
+<div class="card">
+  <h2>6. Final Confidence Check</h2>
+  <p>Use this before the test. Can you explain these without notes?</p>
+  <div class="grid">
+    <div class="item">Explain checks and balances with an example.</div>
+    <div class="item">Explain why elections give citizens power.</div>
+    <div class="item">Compare civil law and criminal law.</div>
+    <div class="item">Explain why judicial review matters.</div>
+    <div class="item">Explain how a bill becomes a law.</div>
+    <div class="item">Explain how foreign policy decisions are influenced.</div>
+  </div>
+</div>
+
+</div>
+
+<footer>Keep practicing. Government makes more sense when you connect the ideas.</footer>
+
+<script>
+const vocab = [
+ ["Any organized group whose members share a common goal and try to promote their cause by influencing policy makers and decision making.","Interest Group"],
+ ["The heads of the executive departments. The president appoints the members of this group.","Cabinet"],
+ ["A system in which each branch of government can limit the power of the other branches.","Checks and Balances"],
+ ["A decree that frees a person from punishment for a crime.","Pardon"],
+ ["The right to exercise supreme authority over a geographic region, a group of people, or oneself.","Sovereignty"],
+ ["The power of the courts to declare laws and executive acts unconstitutional.","Judicial Review"],
+ ["The branch of law that concerns relationships between private parties.","Civil Law"],
+ ["Any tax in which the burden falls more heavily on the rich than the poor, such as state and federal income taxes.","Progressive Tax"],
+ ["A course of action developed by a country's leaders to pursue their nation's vital interests in dealings with other countries.","Foreign Policy"],
+ ["Real or imagined prejudice that is thought to affect what stories journalists cover and how they report those stories.","Media Bias"],
+ ["The status of being a citizen, a person who by birth or naturalization enjoys certain rights and has certain duties in a nation-state.","Citizenship"],
+ ["The idea that the powers of a government should be split between two or more strongly independent branches.","Separation of Powers"],
+ ["Drawing the boundaries of a legislative district with the intent of giving one party or group a significant advantage.","Gerrymandering"],
+ ["A permanent group of legislators from either the House or Senate responsible for specific policy areas, such as foreign affairs or agriculture.","Standing Committee"],
+ ["A person who lives in an electoral district and is represented by an elected official.","Constituent"],
+ ["Any tax in which the burden falls more heavily on the poor than the rich, such as sales tax.","Regressive Tax"],
+ ["The branch of law that regulates the conduct of individuals, defines crimes, and provides punishment for acts of crime.","Criminal Law"],
+ ["The tactic of using endless speeches on the Senate floor to delay or prevent passage of legislation.","Filibuster"],
+ ["A group of citizens who examine the evidence in a case to decide whether the person is guilty of the crimes for which they are charged.","Jury"],
+ ["An international group formed by private individuals and associations to provide a service or pursue a public policy.","Non-Governmental Organization"]
+];
+
+const vocabOptions = [
+  "Sovereignty","Separation of Powers","Checks and Balances","Judicial Review","Gerrymandering","Citizenship","Interest Group","Media Bias","Constituent","Standing Committee","Filibuster","Cabinet","Pardon","Progressive Tax","Regressive Tax","Criminal Law","Civil Law","Jury","Foreign Policy","Non-Governmental Organization"
+];
+
+let flashDeck=[];
+let flashIndex=0;
+let flashShowingAnswer=false;
+
+function showVocabTab(tabId, btn){
+  document.querySelectorAll(".tabPanel").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".tabButton").forEach(b=>b.classList.remove("active"));
+  document.getElementById(tabId).classList.add("active");
+  btn.classList.add("active");
+}
+
+function buildFlashcards(){
+  flashDeck=shuffle(vocab);
+  flashIndex=0;
+  flashShowingAnswer=false;
+  renderFlashcard();
+}
+
+function renderFlashcard(){
+  const card=document.getElementById("flashcard");
+  const pair=flashDeck[flashIndex];
+  if(!pair)return;
+  if(flashShowingAnswer){
+    card.innerHTML=`<div class="label">TERM</div><strong>${pair[1]}</strong>`;
+  }else{
+    card.innerHTML=`<div class="label">DEFINITION</div>${pair[0]}`;
+  }
+  document.getElementById("flashResult").innerHTML=`Card ${flashIndex+1} of ${flashDeck.length}`;
+}
+
+function flipCard(){
+  flashShowingAnswer=!flashShowingAnswer;
+  renderFlashcard();
+}
+
+function nextCard(){
+  flashIndex=(flashIndex+1)%flashDeck.length;
+  flashShowingAnswer=false;
+  renderFlashcard();
+}
+
+function prevCard(){
+  flashIndex=(flashIndex-1+flashDeck.length)%flashDeck.length;
+  flashShowingAnswer=false;
+  renderFlashcard();
+}
+
+function shuffleFlashcards(){
+  buildFlashcards();
+}
+
+function buildAnswerKey(){
+  const body=document.getElementById("answerKeyBody");
+  body.innerHTML="";
+  vocab.forEach(pair=>{
+    const row=document.createElement("tr");
+    row.innerHTML=`<td>${pair[1]}</td><td>${pair[0]}</td>`;
+    body.appendChild(row);
+  });
+}
+
+function shuffle(arr){return [...arr].sort(()=>Math.random()-.5)}
+
+function buildVocab(){
+  const box=document.getElementById("vocabQuiz");
+  box.innerHTML="";
+  shuffle(vocab).forEach((pair,i)=>{
+    const div=document.createElement("div");
+    div.className="question";
+    div.dataset.answer=pair[1];
+    div.innerHTML=`<strong>${i+1}.</strong> ${pair[0]}`;
+    const sel=document.createElement("select");
+    sel.innerHTML=`<option value="">Choose a term</option>`+vocabOptions.map(o=>`<option>${o}</option>`).join("");
+    div.appendChild(sel);
+    box.appendChild(div);
+  });
+}
+function checkVocab(){
+  let score=0,total=0;
+  document.querySelectorAll("#vocabQuiz .question").forEach(q=>{
+    total++;
+    q.classList.remove("correct","incorrect");
+    const right=q.dataset.answer;
+    const picked=q.querySelector("select").value;
+    if(picked===right){score++; q.classList.add("correct")}
+    else{q.classList.add("incorrect")}
+  });
+  document.getElementById("vocabResult").innerHTML=`You got ${score}/${total}. ${score===total?"Perfect vocab run.":"Green means correct. Red means review and retry."}`;
+}
+function resetVocab(){
+  buildVocab();
+  document.getElementById("vocabResult").innerHTML="";
+}
+
+const MATCH_PAIR_COUNT=20;
+const MATCH_BOARD_PAIR_COUNT=6;
+const MATCH_BEST_TIME_KEY="govVocabMatchBestTime";
+
+let matchTimer=null;
+let matchStartTime=0;
+let matchSelected=null;
+let matchDeck=[];
+let matchNextIndex=0;
+let matchScore=0;
+let matchMistakes=0;
+let matchTotal=Math.min(MATCH_PAIR_COUNT,vocab.length);
+let matchGameActive=false;
+
+function escapeHTML(text){
+  const div=document.createElement("div");
+  div.textContent=text;
+  return div.innerHTML;
+}
+
+function loadBestTime(){
+  const bestEl=document.getElementById("matchBestTime");
+  if(!bestEl)return;
+  const best=localStorage.getItem(MATCH_BEST_TIME_KEY);
+  bestEl.textContent=best ? best+"s" : "None yet";
+  const totalEl=document.getElementById("matchTotal");
+  if(totalEl)totalEl.textContent=matchTotal;
+}
+
+function startMatchGame(){
+  clearInterval(matchTimer);
+
+  matchSelected=null;
+  matchDeck=shuffle(vocab).slice(0,matchTotal);
+  matchNextIndex=0;
+  matchScore=0;
+  matchMistakes=0;
+  matchGameActive=true;
+
+  document.getElementById("matchScore").textContent=matchScore;
+  document.getElementById("matchTotal").textContent=matchTotal;
+  document.getElementById("matchMistakes").textContent=matchMistakes;
+  document.getElementById("matchTime").textContent="0.0";
+  document.getElementById("matchMessage").innerHTML=`Match all ${matchTotal} word-definition pairs. A correct pair disappears and a new pair joins the board.`;
+
+  const grid=document.getElementById("matchGrid");
+  grid.innerHTML="";
+
+  for(let i=0;i<MATCH_BOARD_PAIR_COUNT;i++){
+    addNextPairToBoard();
+  }
+
+  shuffleBoardCards();
+
+  matchStartTime=Date.now();
+  matchTimer=setInterval(updateMatchTimer,100);
+  updateMatchTimer();
+}
+
+function updateMatchTimer(){
+  if(!matchGameActive)return;
+  document.getElementById("matchTime").textContent=((Date.now()-matchStartTime)/1000).toFixed(1);
+}
+
+function addNextPairToBoard(){
+  if(matchNextIndex>=matchDeck.length)return;
+
+  const pair=matchDeck[matchNextIndex];
+  const pairId="gov-pair-"+matchNextIndex;
+  matchNextIndex++;
+
+  createMatchCard(pairId,"WORD",pair[1]);
+  createMatchCard(pairId,"DEFINITION",pair[0]);
+}
+
+function createMatchCard(pairId,type,text){
+  const grid=document.getElementById("matchGrid");
+  const card=document.createElement("button");
+  card.type="button";
+  card.className="matchCardGame";
+  card.dataset.id=pairId;
+  card.dataset.type=type;
+  card.innerHTML=`<span><span class="matchType">${type}</span>${escapeHTML(text)}</span>`;
+  card.addEventListener("click",()=>selectMatchCard(card));
+  grid.appendChild(card);
+}
+
+function shuffleBoardCards(){
+  const grid=document.getElementById("matchGrid");
+  const cards=[...grid.children];
+  shuffle(cards).forEach(card=>grid.appendChild(card));
+}
+
+function selectMatchCard(card){
+  if(!matchGameActive || card.classList.contains("matched"))return;
+
+  if(!matchSelected){
+    matchSelected=card;
+    card.classList.add("selected");
+    document.getElementById("matchMessage").innerHTML="Now choose its matching "+(card.dataset.type==="WORD" ? "definition." : "word.");
+    return;
+  }
+
+  if(matchSelected===card){
+    card.classList.remove("selected");
+    matchSelected=null;
+    document.getElementById("matchMessage").innerHTML="Selection cleared. Choose any word or definition to keep matching.";
+    return;
+  }
+
+  const isMatch=matchSelected.dataset.id===card.dataset.id && matchSelected.dataset.type!==card.dataset.type;
+
+  if(isMatch){
+    handleCorrectMatch(card);
+  }else{
+    handleIncorrectMatch(card);
+  }
+}
+
+function handleCorrectMatch(card){
+  const first=matchSelected;
+  const second=card;
+
+  first.classList.remove("selected");
+  first.classList.add("matched");
+  second.classList.add("matched");
+  first.disabled=true;
+  second.disabled=true;
+  matchSelected=null;
+
+  matchScore++;
+  document.getElementById("matchScore").textContent=matchScore;
+  document.getElementById("matchMessage").innerHTML=`Correct! ${matchTotal-matchScore} pairs left.`;
+
+  setTimeout(()=>{
+    first.remove();
+    second.remove();
+
+    addNextPairToBoard();
+    shuffleBoardCards();
+
+    if(matchScore===matchTotal){
+      endMatchGame();
+    }
+  },250);
+}
+
+function handleIncorrectMatch(card){
+  matchMistakes++;
+  document.getElementById("matchMistakes").textContent=matchMistakes;
+  document.getElementById("matchMessage").innerHTML="Not a match. Try a different word-definition pair.";
+
+  const first=matchSelected;
+  first.classList.add("wrong");
+  card.classList.add("wrong");
+
+  setTimeout(()=>{
+    first.classList.remove("selected","wrong");
+    card.classList.remove("wrong");
+    matchSelected=null;
+  },350);
+}
+
+function endMatchGame(){
+  clearInterval(matchTimer);
+  matchGameActive=false;
+
+  const elapsed=((Date.now()-matchStartTime)/1000).toFixed(1);
+  document.getElementById("matchTime").textContent=elapsed;
+  const oldBest=localStorage.getItem(MATCH_BEST_TIME_KEY);
+
+  let message=`🎉 You cleared all ${matchTotal} vocab matches in ${elapsed}s with ${matchMistakes} mistakes.`;
+
+  if(!oldBest || parseFloat(elapsed)<parseFloat(oldBest)){
+    localStorage.setItem(MATCH_BEST_TIME_KEY,elapsed);
+    message+=" New best time!";
+  }else{
+    message+=` Best time to beat: ${oldBest}s.`;
+  }
+
+  document.getElementById("matchMessage").innerHTML=message;
+  loadBestTime();
+}
+
+const sortCards=[
+ ["Checks and balances","Branches & Powers"],
+ ["Separation of powers","Branches & Powers"],
+ ["Cabinet","Branches & Powers"],
+ ["Pardon","Branches & Powers"],
+ ["Voting in elections","Citizens & Elections"],
+ ["Constituent","Citizens & Elections"],
+ ["Interest group influence","Citizens & Elections"],
+ ["Media bias and campaigns","Citizens & Elections"],
+ ["Judicial review","Law & Courts"],
+ ["Due process","Law & Courts"],
+ ["Civil law vs criminal law","Law & Courts"],
+ ["Jury","Law & Courts"],
+ ["Foreign policy","Policy & Global Issues"],
+ ["United Nations","Policy & Global Issues"],
+ ["Taxes and national debt","Policy & Global Issues"],
+ ["Non-governmental organization","Policy & Global Issues"]
+];
+
+function buildSort(){
+  document.getElementById("sortResult").innerHTML="";
+  document.querySelectorAll(".dropzone").forEach(z=>z.querySelectorAll(".termchip").forEach(c=>c.remove()));
+  const area=document.getElementById("sortTerms");
+  area.innerHTML="<h3>Cards to Sort</h3>";
+  shuffle(sortCards).forEach(([text,cat])=>{
+    const chip=document.createElement("div");
+    chip.className="termchip";
+    chip.draggable=true;
+    chip.textContent=text;
+    chip.dataset.cat=cat;
+    chip.addEventListener("dragstart",e=>e.dataTransfer.setData("text/plain",text+"||"+cat));
+    area.appendChild(chip);
+  });
+}
+document.addEventListener("dragover",e=>{if(e.target.closest(".dropzone")||e.target.id==="sortTerms") e.preventDefault();});
+document.addEventListener("drop",e=>{
+  const zone=e.target.closest(".dropzone") || (e.target.id==="sortTerms"?e.target:null);
+  if(!zone)return;
+  e.preventDefault();
+  const data=e.dataTransfer.getData("text/plain").split("||");
+  const existing=[...document.querySelectorAll(".termchip")].find(c=>c.textContent===data[0]);
+  if(existing) zone.appendChild(existing);
+});
+function checkSort(){
+  let score=0,total=sortCards.length;
+  document.querySelectorAll(".termchip").forEach(c=>c.classList.remove("correct","incorrect"));
+  document.querySelectorAll(".dropzone .termchip").forEach(c=>{
+    const zone=c.closest(".dropzone").dataset.zone;
+    if(zone===c.dataset.cat){score++; c.classList.add("correct")}
+    else c.classList.add("incorrect");
+  });
+  document.getElementById("sortResult").innerHTML=`Sorted correctly: ${score}/${total}. Move the red cards and check again.`;
+}
+
+let selectedChip=null;
+document.addEventListener("click", e=>{
+  const chip=e.target.closest(".termchip");
+  if(chip){
+    if(selectedChip) selectedChip.classList.remove("selected");
+    selectedChip=chip;
+    selectedChip.classList.add("selected");
+    return;
+  }
+  const zone=e.target.closest(".dropzone");
+  if(zone && selectedChip){
+    zone.appendChild(selectedChip);
+    selectedChip.classList.remove("selected");
+    selectedChip=null;
+  }
+});
+
+const mc = [
+ {q:"Legitimate authority exists when...", a:"People accept a leader's power as fair or lawful.", choices:["People accept a leader's power as fair or lawful.","A leader uses force only.","A person has money.","A government passes many laws."]},
+ {q:"Dividing power among branches helps...", a:"Prevent one group from becoming too powerful.", choices:["Prevent one group from becoming too powerful.","Make elections unnecessary.","Give courts all power.","End disagreement."]},
+ {q:"Courts protect civil liberties by...", a:"Interpreting how rights apply in real cases.", choices:["Interpreting how rights apply in real cases.","Writing all new laws.","Running elections.","Controlling political parties."]},
+ {q:"Interest groups try to influence lawmakers because they want...", a:"Policy decisions to reflect their goals.", choices:["Policy decisions to reflect their goals.","To replace all courts.","To run every election.","To write the original Constitution."]},
+ {q:"Congress has major influence through appropriations because it...", a:"Controls how money is raised and spent.", choices:["Controls how money is raised and spent.","Declares laws unconstitutional.","Negotiates all treaties alone.","Runs local police departments."]},
+ {q:"Judicial review is important because it allows courts to...", a:"Strike down unconstitutional laws or actions.", choices:["Strike down unconstitutional laws or actions.","Vote in elections.","Create taxes directly.","Command the military."]},
+ {q:"Diplomacy is shown when the U.S...", a:"Signs a treaty or negotiates with another nation.", choices:["Signs a treaty or negotiates with another nation.","Invades another country.","Punishes citizens without trial.","Cancels all elections."]},
+ {q:"A strong short answer about citizens should connect knowledge to...", a:"Action, participation, and responsibility.", choices:["Action, participation, and responsibility.","Avoiding elections.","Ignoring policy.","Only watching the news."]}
+];
+
+function buildMC(){
+  const box=document.getElementById("mcQuiz");
+  box.innerHTML="";
+  shuffle(mc).slice(0,6).forEach((m,i)=>{
+    const div=document.createElement("div");
+    div.className="question";
+    div.dataset.answer=m.a;
+    div.innerHTML=`<strong>${i+1}.</strong> ${m.q}`;
+    shuffle(m.choices).forEach(ch=>{
+      div.innerHTML+=`<label class="item mcChoice"><input type="radio" name="mc${i}" value="${ch}"><span>${ch}</span></label>`;
+    });
+    box.appendChild(div);
+  });
+  document.getElementById("mcResult").innerHTML="";
+  document.getElementById("mcBar").style.width="0%";
+}
+function checkMC(){
+  let score=0,total=0;
+  document.querySelectorAll("#mcQuiz .question").forEach(q=>{
+    total++;
+    q.classList.remove("correct","incorrect");
+    const picked=q.querySelector("input:checked");
+    if(picked && picked.value===q.dataset.answer){score++; q.classList.add("correct")}
+    else q.classList.add("incorrect");
+  });
+  document.getElementById("mcBar").style.width=(score/total*100)+"%";
+  document.getElementById("mcResult").innerHTML=`You got ${score}/${total}. Read the red ones and ask yourself: Which answer BEST matches the government idea being tested?`;
+}
+
+const causes=[
+ {q:"If power is divided among branches, government is more likely to...", a:"limit abuse of power", choices:["limit abuse of power","end all elections","remove citizens from government","avoid courts"]},
+ {q:"If citizens vote, they can...", a:"select leaders who make policy decisions", choices:["select leaders who make policy decisions","declare laws unconstitutional","write every court decision","end all disagreement"]},
+ {q:"If Congress controls funding, it can influence whether programs...", a:"actually happen", choices:["actually happen","become court cases only","are removed from the Constitution","stop being laws automatically"]},
+ {q:"If a court uses judicial review, it can...", a:"strike down unconstitutional laws", choices:["strike down unconstitutional laws","sign treaties","appoint cabinet members","collect taxes directly"]},
+ {q:"If countries work through international organizations, they are usually trying to...", a:"solve problems no country can handle alone", choices:["solve problems no country can handle alone","replace all national governments","avoid all elections","control every citizen"]}
+];
+function buildCause(){
+  const box=document.getElementById("causeQuiz");
+  box.innerHTML="";
+  causes.forEach((c,i)=>{
+    const div=document.createElement("div");
+    div.className="question";
+    div.dataset.answer=c.a;
+    div.innerHTML=`<strong>${i+1}.</strong> ${c.q}`;
+    const sel=document.createElement("select");
+    sel.innerHTML="<option value=''>Choose the likely effect</option>"+shuffle(c.choices).map(x=>`<option>${x}</option>`).join("");
+    div.appendChild(sel);
+    box.appendChild(div);
+  });
+}
+function checkCause(){
+  let score=0,total=0;
+  document.querySelectorAll("#causeQuiz .question").forEach(q=>{
+    total++;
+    q.classList.remove("correct","incorrect");
+    const val=q.querySelector("select").value;
+    if(val===q.dataset.answer){score++; q.classList.add("correct")}
+    else q.classList.add("incorrect");
+  });
+  document.getElementById("causeResult").innerHTML=`Cause and effect score: ${score}/${total}.`;
+}
+
+const prompts=[
+ ["Republicans and Democrats","Explain how different beliefs of Republicans and Democrats can shape the choices voters and government make."],
+ ["Bill Becomes a Law","Explain how a bill becomes a law. Use legislative and executive vocabulary."],
+ ["Citizenship and Constitutional Government","Explain why knowledge about government and citizen action are both important for effective government."],
+ ["Foreign Policy","Explain how economic, political, national security, and cultural issues can influence U.S. foreign policy decisions."],
+ ["State and Federal Courts","Explain how state and federal courts work together to resolve conflicts and protect citizens' rights."]
+];
+function loadPrompt(){
+  const idx=document.getElementById("promptSelect").value;
+  document.getElementById("promptBox").innerHTML="<strong>"+prompts[idx][0]+":</strong> "+prompts[idx][1];
+}
+function buildPrompts(){
+  const sel=document.getElementById("promptSelect");
+  sel.innerHTML=prompts.map((p,i)=>`<option value="${i}">${p[0]}</option>`).join("");
+  loadPrompt();
+}
+function scoreShortAnswer(){
+  const text=document.getElementById("shortAnswer").value.trim();
+  const sentences=(text.match(/[.!?]+/g)||[]).length;
+  const checks=[...document.querySelectorAll(".saCheck")].filter(c=>c.checked).length;
+  let msg=`Checklist: ${checks}/4. Sentence count estimate: ${sentences}. `;
+  if(sentences>=3 && sentences<=5 && checks>=3) msg+="Strong practice answer. You are aiming for exam ready.";
+  else if(sentences<3) msg+="Add more explanation. Aim for 3 to 5 complete sentences.";
+  else msg+="Good start. Add vocabulary, cause and effect, and a specific example.";
+  document.getElementById("saResult").innerHTML=msg;
+}
+
+buildVocab();
+buildFlashcards();
+buildAnswerKey();
+loadBestTime();
+buildSort();
+buildMC();
+buildCause();
+buildPrompts();
+</script>
+</body>
+</html>
