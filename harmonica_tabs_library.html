@@ -30,6 +30,9 @@ body{
     linear-gradient(135deg,#fffdfa 0%, var(--paper) 48%, #eaf5ff 100%);
   min-height:100vh;
 }
+body.song-open{
+  background:var(--card);
+}
 button,input,select,textarea{font:inherit}
 button{
   border:0;
@@ -46,6 +49,19 @@ button.secondary{background:#edf2f7;color:var(--ink);box-shadow:none}
 button.secondary:hover,button.secondary:focus-visible{background:#dbe7f3}
 button.favorite{background:var(--gold);color:#3b2600;box-shadow:0 8px 18px rgba(240,180,41,.24)}
 button.favorite.active{background:var(--red);color:white}
+button.tab-button{
+  width:100%;
+  background:#edf2f7;
+  color:var(--ink);
+  box-shadow:none;
+  border:1px solid transparent;
+}
+button.tab-button.active{
+  background:var(--blue);
+  color:white;
+  border-color:var(--blue-dark);
+  box-shadow:0 8px 18px rgba(23,105,170,.18);
+}
 input,select,textarea{
   width:100%;
   border:1px solid #cbd5e0;
@@ -66,18 +82,30 @@ header{
 header h1{margin:0;font-size:clamp(2rem,8vw,4rem);letter-spacing:-.06em}
 header p{margin:.65rem auto 0;max-width:46rem;color:#dceeff;font-size:1.05rem;line-height:1.55}
 .container{width:min(1120px,100%);margin:auto;padding:1rem}
-.toolbar{
+.control-tabs{
   display:grid;
-  grid-template-columns:1fr;
-  gap:.85rem;
+  grid-template-columns:1fr 1fr;
+  gap:.6rem;
+  margin-top:1rem;
+  padding:.55rem;
+  background:rgba(255,255,255,.78);
+  border:1px solid rgba(23,105,170,.18);
+  border-radius:999px;
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(10px);
+}
+.tab-panel{
+  display:none;
   margin-top:1rem;
   padding:1rem;
-  background:rgba(255,255,255,.76);
+  background:rgba(255,255,255,.82);
   border:1px solid rgba(23,105,170,.18);
   border-radius:28px;
   box-shadow:var(--shadow);
   backdrop-filter:blur(10px);
 }
+.tab-panel.active{display:grid;gap:.85rem}
+.tab-panel h2{margin:.1rem 0 .2rem;font-size:1.25rem}
 .toolbar-row{display:grid;grid-template-columns:1fr;gap:.85rem}
 .tag-filter{display:flex;gap:.55rem;overflow-x:auto;padding:.15rem .05rem .45rem;scrollbar-width:thin}
 .chip{
@@ -112,13 +140,31 @@ header p{margin:.65rem auto 0;max-width:46rem;color:#dceeff;font-size:1.05rem;li
   cursor:pointer;
   text-align:left;
   border-left:7px solid var(--gold);
+  background:var(--card);
+  color:var(--ink);
 }
-.song-card:hover,.song-card:focus-within{transform:translateY(-2px);border-color:var(--blue)}
-.song-card h3{margin:0;font-size:1.18rem}
+.song-card:hover,.song-card:focus-within{transform:translateY(-2px);border-color:var(--blue);background:var(--card);color:var(--ink)}
+.song-card[aria-pressed="true"]{border-color:var(--blue);box-shadow:0 14px 28px rgba(23,105,170,.22)}
+.song-card h3{margin:0;font-size:1.18rem;color:var(--ink)}
 .song-meta{display:flex;flex-wrap:wrap;gap:.45rem;color:var(--muted);font-size:.9rem;font-weight:700}
 .song-tags{display:flex;flex-wrap:wrap;gap:.4rem}.tag{background:#edf2f7;color:#334155;border-radius:999px;padding:.3rem .55rem;font-size:.78rem;font-weight:800}.key-badge{background:#fff0bd;color:#654200;border-radius:999px;padding:.3rem .6rem;font-weight:900}
 .detail-empty{padding:2rem;text-align:center;color:var(--muted)}
 .song-detail{overflow:hidden}
+.song-detail.is-empty{box-shadow:none;border-style:dashed;background:rgba(255,255,255,.58)}
+.back-button{background:var(--blue-dark)}
+.description-box{white-space:pre-wrap;line-height:1.7;font-size:1.05rem;background:#f8fafc;border:1px solid #e2e8f0;border-radius:20px;padding:1rem;color:var(--ink)}
+body.song-open header,
+body.song-open .control-tabs,
+body.song-open .tab-panel,
+body.song-open .panel,
+body.song-open footer{display:none}
+body.song-open .container{width:100%;padding:0}
+body.song-open .library-layout{display:block;margin:0}
+body.song-open .song-detail{min-height:100vh;border:0;border-radius:0;box-shadow:none;background:var(--card)}
+body.song-open .detail-hero{position:sticky;top:0;z-index:2}
+body.song-open .section{padding:clamp(1rem,4vw,2.25rem)}
+.catalog-heading{display:flex;justify-content:space-between;gap:.75rem;align-items:center;flex-wrap:wrap}
+.catalog-heading p{margin:0;color:var(--muted);font-weight:700}
 .detail-hero{padding:1.15rem;background:linear-gradient(135deg,#fff8e6,#eaf5ff);border-bottom:1px solid rgba(23,105,170,.12)}
 .detail-title{display:flex;justify-content:space-between;gap:.75rem;align-items:flex-start}.detail-title h2{font-size:clamp(1.7rem,7vw,2.7rem);line-height:1;margin:0}.detail-actions{display:flex;gap:.45rem;flex-wrap:wrap;justify-content:flex-end}
 .keyline{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.8rem;align-items:center}.keyline strong{font-size:1.05rem}.section{padding:1rem;border-top:1px solid #edf2f7}.section h3{margin:.1rem 0 .75rem;color:var(--blue-dark)}
@@ -136,11 +182,11 @@ header p{margin:.65rem auto 0;max-width:46rem;color:#dceeff;font-size:1.05rem;li
   box-shadow:inset 0 0 0 2px rgba(240,180,41,.35);
 }
 .lyrics-box{white-space:pre-wrap;line-height:1.75;font-size:1.08rem;background:var(--cream);border-radius:20px;padding:1rem}
-.editor{margin-top:1rem;padding:1rem}.form-grid{display:grid;grid-template-columns:1fr;gap:.5rem}.editor-actions{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1rem}.notice{padding:.85rem 1rem;border-radius:16px;background:#e6fffa;color:#234e52;font-weight:800;display:none}.notice.show{display:block}.empty-results{text-align:center;color:var(--muted);padding:1.5rem}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-top:1rem}.stat{background:white;border-radius:18px;padding:.75rem;text-align:center;border:1px solid #edf2f7}.stat b{display:block;font-size:1.3rem;color:var(--blue-dark)}
+.editor{padding:0;background:transparent;border:0;box-shadow:none}.form-grid{display:grid;grid-template-columns:1fr;gap:.5rem}.editor-actions{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1rem}.notice{padding:.85rem 1rem;border-radius:16px;background:#e6fffa;color:#234e52;font-weight:800;display:none}.notice.show{display:block}.empty-results{text-align:center;color:var(--muted);padding:1.5rem}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-top:1rem}.stat{background:white;border-radius:18px;padding:.75rem;text-align:center;border:1px solid #edf2f7}.stat b{display:block;font-size:1.3rem;color:var(--blue-dark)}
 footer{text-align:center;color:var(--muted);padding:2rem 1rem}
 @media (min-width:720px){
-  .toolbar-row{grid-template-columns:2fr 1fr 1fr}.library-layout{grid-template-columns:minmax(280px,390px) 1fr;align-items:start}.form-grid{grid-template-columns:1fr 1fr}.form-grid .wide{grid-column:1/-1}.container{padding:1.25rem}.section,.detail-hero{padding:1.35rem}.toolbar{padding:1.25rem}.panel{position:sticky;top:1rem}.song-list{max-height:72vh;overflow:auto;padding-right:.25rem}.editor{grid-column:1/-1}}
-@media (max-width:520px){button{width:100%}.detail-actions button{width:auto;flex:1}.stats{grid-template-columns:1fr}.song-card{border-left-width:5px}.tab-box{margin-left:-.15rem;margin-right:-.15rem}}
+  .toolbar-row{grid-template-columns:2fr 1fr 1fr}.library-layout{grid-template-columns:minmax(0,1.6fr) minmax(320px,.9fr);align-items:start}.library-layout:not(.has-selection){grid-template-columns:1fr}.form-grid{grid-template-columns:1fr 1fr}.form-grid .wide{grid-column:1/-1}.container{padding:1.25rem}.section,.detail-hero{padding:1.35rem}.tab-panel{padding:1.25rem}.panel{min-height:62vh}.song-list{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}.library-layout.has-selection .song-list{grid-template-columns:1fr;max-height:72vh;overflow:auto;padding-right:.25rem}}
+@media (max-width:520px){button{width:100%}.control-tabs{border-radius:24px}.detail-actions button{width:auto;flex:1}.stats{grid-template-columns:1fr}.song-card{border-left-width:5px}.tab-box{margin-left:-.15rem;margin-right:-.15rem}}
 </style>
 </head>
 <body>
@@ -149,7 +195,13 @@ footer{text-align:center;color:var(--muted);padding:2rem 1rem}
   <p>Save song tabs, lyrics, keys, tags, and favorites in a mobile-first catalogue built for quick practice sessions.</p>
 </header>
 <main class="container">
-  <section class="toolbar" aria-label="Library controls">
+  <nav class="control-tabs" aria-label="Library tools">
+    <button class="tab-button active" type="button" data-tab="search" aria-controls="searchPanel" aria-selected="true">Search songs</button>
+    <button class="tab-button" type="button" data-tab="add" aria-controls="addPanel" aria-selected="false">Add new song</button>
+  </nav>
+
+  <section id="searchPanel" class="tab-panel active" aria-label="Search and sort songs">
+    <h2>Search the catalogue</h2>
     <div class="toolbar-row">
       <label>Search songs, lyrics, or tabs
         <input id="searchInput" type="search" placeholder="Try: blues, C, grace, -4 5..." />
@@ -175,22 +227,8 @@ footer{text-align:center;color:var(--muted);padding:2rem 1rem}
     </div>
   </section>
 
-  <section class="library-layout">
-    <aside class="panel">
-      <h2>Catalogue</h2>
-      <div id="songList" class="song-list"></div>
-      <div class="stats" aria-label="Library statistics">
-        <div class="stat"><b id="totalCount">0</b>songs</div>
-        <div class="stat"><b id="favoriteCount">0</b>faves</div>
-        <div class="stat"><b id="tagCount">0</b>tags</div>
-      </div>
-    </aside>
-
-    <article id="songDetail" class="song-detail" aria-live="polite">
-      <div class="detail-empty">Choose a song from the catalogue to view large harmonica tabs, lyrics, and the song key.</div>
-    </article>
-
-    <section class="editor" aria-label="Add a song">
+  <section id="addPanel" class="tab-panel" aria-label="Add a song" hidden>
+    <section class="editor">
       <h2>Add a song to the library</h2>
       <p class="notice" id="saveNotice">Song saved to this browser.</p>
       <form id="songForm">
@@ -207,6 +245,9 @@ footer{text-align:center;color:var(--muted);padding:2rem 1rem}
           <label>Tags / categories
             <input id="tagsField" placeholder="folk, beginner, campfire" />
           </label>
+          <label class="wide">Description / practice notes
+            <textarea id="descriptionField" placeholder="Add a short song description, practice goal, or lesson notes."></textarea>
+          </label>
           <label class="wide">Large harmonica tab
             <textarea id="tabsField" required placeholder="4 -4 5 6\n6 5 -4 4"></textarea>
           </label>
@@ -221,6 +262,27 @@ footer{text-align:center;color:var(--muted);padding:2rem 1rem}
       </form>
     </section>
   </section>
+
+  <section class="library-layout" id="libraryLayout">
+    <aside class="panel">
+      <div class="catalog-heading">
+        <div>
+          <h2>Catalogue</h2>
+          <p>Select a song to open its practice page.</p>
+        </div>
+      </div>
+      <div id="songList" class="song-list"></div>
+      <div class="stats" aria-label="Library statistics">
+        <div class="stat"><b id="totalCount">0</b>songs</div>
+        <div class="stat"><b id="favoriteCount">0</b>faves</div>
+        <div class="stat"><b id="tagCount">0</b>tags</div>
+      </div>
+    </aside>
+
+    <article id="songDetail" class="song-detail is-empty" aria-live="polite">
+      <div class="detail-empty">Choose a song from the catalogue to load the song page with large harmonica tabs, lyrics, and the song key.</div>
+    </article>
+  </section>
 </main>
 <footer>Favorites and custom songs are saved with localStorage on this device.</footer>
 <script>
@@ -231,6 +293,7 @@ const demoSongs = [
     artist:"Traditional hymn",
     key:"G",
     tags:["hymn","beginner","slow"],
+    description:"A slow, expressive hymn that is great for practicing clean single notes and gentle breathing.",
     tabs:"6  7  8  7  8  -8  7\n6  7  8  7  8  -8  9\n8  9  8  7  6  7  8  7",
     lyrics:"Amazing grace, how sweet the sound\nThat saved a soul like me\nI once was lost, but now am found\nWas blind, but now I see"
   },
@@ -240,6 +303,7 @@ const demoSongs = [
     artist:"Stephen Foster",
     key:"C",
     tags:["folk","campfire","medium"],
+    description:"A bright campfire folk tune with repeated phrases for building steady rhythm and confidence.",
     tabs:"4 4 5 6 6 -6 6 5 4\n4 4 5 6 6 -6 6 5 5\n5 5 -5 6 6 -6 6 5 4",
     lyrics:"I come from Alabama with my banjo on my knee\nI'm going to Louisiana, my true love for to see"
   },
@@ -249,6 +313,7 @@ const demoSongs = [
     artist:"Traditional spiritual",
     key:"F",
     tags:["spiritual","jazz","beginner"],
+    description:"A classic spiritual and jazz standard that works well for practicing short, punchy phrases.",
     tabs:"4 5 -5 6\n4 5 -5 6\n4 5 -5 6 5 4 5\n5 4 5 -4",
     lyrics:"Oh, when the saints go marching in\nOh, when the saints go marching in\nLord, I want to be in that number\nWhen the saints go marching in"
   },
@@ -258,6 +323,7 @@ const demoSongs = [
     artist:"Traditional nursery song",
     key:"C",
     tags:["kids","beginner","practice"],
+    description:"A familiar beginner melody for learning note spacing and smooth movement between holes.",
     tabs:"4 4 6 6 -6 -6 6\n-5 -5 5 5 -4 -4 4\n6 6 -5 -5 5 5 -4",
     lyrics:"Twinkle, twinkle, little star\nHow I wonder what you are\nUp above the world so high\nLike a diamond in the sky"
   }
@@ -268,7 +334,7 @@ const favoritesKey = "harmonicaTabFavorites.v1";
 let songs = loadSongs();
 let favorites = new Set(JSON.parse(localStorage.getItem(favoritesKey) || "[]"));
 let activeTag = "all";
-let selectedId = songs[0]?.id;
+let selectedId = null;
 
 const songList = document.getElementById("songList");
 const songDetail = document.getElementById("songDetail");
@@ -277,6 +343,12 @@ const sortSelect = document.getElementById("sortSelect");
 const viewSelect = document.getElementById("viewSelect");
 const tagFilter = document.getElementById("tagFilter");
 const saveNotice = document.getElementById("saveNotice");
+const libraryLayout = document.getElementById("libraryLayout");
+const tabButtons = document.querySelectorAll(".tab-button");
+const tabPanels = {
+  search: document.getElementById("searchPanel"),
+  add: document.getElementById("addPanel")
+};
 
 function loadSongs(){
   const saved = localStorage.getItem(libraryKey);
@@ -306,7 +378,7 @@ function allTags(){
 function filteredSongs(){
   const query = searchInput.value.trim().toLowerCase();
   let result = songs.filter(song => {
-    const haystack = `${song.title} ${song.artist} ${song.key} ${song.tags.join(" ")} ${song.tabs} ${song.lyrics}`.toLowerCase();
+    const haystack = `${song.title} ${song.artist} ${song.key} ${song.tags.join(" ")} ${song.description || ""} ${song.tabs} ${song.lyrics}`.toLowerCase();
     const tagMatch = activeTag === "all" || song.tags.includes(activeTag);
     const favoriteMatch = viewSelect.value !== "favorites" || favorites.has(song.id);
     return haystack.includes(query) && tagMatch && favoriteMatch;
@@ -335,10 +407,11 @@ function renderList(){
   document.getElementById("favoriteCount").textContent = favorites.size;
   document.getElementById("tagCount").textContent = allTags().length;
   if(!visible.length){
+    selectedId = null;
     songList.innerHTML = `<div class="empty-results">No songs match this search or category.</div>`;
     return;
   }
-  if(!visible.some(song => song.id === selectedId)) selectedId = visible[0].id;
+  if(selectedId && !visible.some(song => song.id === selectedId)) selectedId = null;
   songList.innerHTML = visible.map(song => `
     <button class="song-card" type="button" data-id="${escapeHtml(song.id)}" aria-pressed="${song.id === selectedId}">
       <h3>${favorites.has(song.id) ? "★ " : ""}${escapeHtml(song.title)}</h3>
@@ -348,8 +421,11 @@ function renderList(){
 }
 function renderDetail(){
   const song = songs.find(item => item.id === selectedId);
+  document.body.classList.toggle("song-open", Boolean(song));
+  libraryLayout.classList.toggle("has-selection", Boolean(song));
+  songDetail.classList.toggle("is-empty", !song);
   if(!song){
-    songDetail.innerHTML = `<div class="detail-empty">Choose a song from the catalogue to view large harmonica tabs, lyrics, and the song key.</div>`;
+    songDetail.innerHTML = `<div class="detail-empty">Choose a song from the catalogue to load the song page with large harmonica tabs, lyrics, and the song key.</div>`;
     return;
   }
   songDetail.innerHTML = `
@@ -357,6 +433,7 @@ function renderDetail(){
       <div class="detail-title">
         <h2>${escapeHtml(song.title)}</h2>
         <div class="detail-actions">
+          <button type="button" class="back-button" id="backToCatalogButton">← Back to catalogue</button>
           <button type="button" class="favorite ${favorites.has(song.id) ? "active" : ""}" id="favoriteButton">${favorites.has(song.id) ? "★ Favorited" : "☆ Favorite"}</button>
           <button type="button" class="secondary" id="deleteButton">Delete</button>
         </div>
@@ -364,8 +441,10 @@ function renderDetail(){
       <div class="keyline"><strong class="key-badge">Key of the song: ${escapeHtml(song.key)}</strong><span>${escapeHtml(song.artist || "Unknown source")}</span></div>
       <div class="song-tags">${song.tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}</div>
     </div>
+    <section class="section"><h3>Description</h3><div class="description-box">${escapeHtml(song.description || "No description saved yet.")}</div></section>
     <section class="section"><h3>Harmonica tabs</h3><div class="tab-box">${escapeHtml(song.tabs)}</div></section>
     <section class="section"><h3>Lyrics / notes</h3><div class="lyrics-box">${escapeHtml(song.lyrics || "No lyrics or notes saved yet.")}</div></section>`;
+  document.getElementById("backToCatalogButton").addEventListener("click", closeSongDetail);
   document.getElementById("favoriteButton").addEventListener("click", () => toggleFavorite(song.id));
   document.getElementById("deleteButton").addEventListener("click", () => deleteSong(song.id));
 }
@@ -373,6 +452,11 @@ function render(){
   renderTags();
   renderList();
   renderDetail();
+}
+function closeSongDetail(){
+  selectedId = null;
+  render();
+  document.querySelector(".catalog-heading")?.scrollIntoView({behavior:"smooth", block:"start"});
 }
 function toggleFavorite(id){
   favorites.has(id) ? favorites.delete(id) : favorites.add(id);
@@ -384,11 +468,29 @@ function deleteSong(id){
   if(!song || !confirm(`Delete "${song.title}" from this browser?`)) return;
   songs = songs.filter(item => item.id !== id);
   favorites.delete(id);
-  selectedId = songs[0]?.id;
+  selectedId = null;
   saveSongs();
   saveFavorites();
   render();
 }
+
+
+function setActiveTab(tabName){
+  tabButtons.forEach(button => {
+    const active = button.dataset.tab === tabName;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-selected", String(active));
+  });
+  Object.entries(tabPanels).forEach(([name, panel]) => {
+    const active = name === tabName;
+    panel.classList.toggle("active", active);
+    panel.hidden = !active;
+  });
+}
+
+tabButtons.forEach(button => {
+  button.addEventListener("click", () => setActiveTab(button.dataset.tab));
+});
 
 tagFilter.addEventListener("click", event => {
   const button = event.target.closest("button[data-tag]");
@@ -417,23 +519,26 @@ document.getElementById("songForm").addEventListener("submit", event => {
     key:document.getElementById("keyField").value.trim(),
     artist:document.getElementById("artistField").value.trim(),
     tags:tags.length ? tags : ["uncategorized"],
+    description:document.getElementById("descriptionField").value.trim(),
     tabs:document.getElementById("tabsField").value.trim(),
     lyrics:document.getElementById("lyricsField").value.trim()
   };
   songs.push(song);
-  selectedId = song.id;
+  selectedId = null;
   saveSongs();
   event.target.reset();
   saveNotice.classList.add("show");
+  setActiveTab("search");
   setTimeout(()=>saveNotice.classList.remove("show"), 2400);
   render();
+  document.querySelector(`button[data-id="${CSS.escape(song.id)}"]`)?.scrollIntoView({behavior:"smooth", block:"center"});
 });
 
 document.getElementById("resetLibraryButton").addEventListener("click", () => {
   if(!confirm("Reset custom songs and favorites to the demo library?")) return;
   songs = demoSongs;
   favorites = new Set();
-  selectedId = songs[0].id;
+  selectedId = null;
   saveSongs();
   saveFavorites();
   render();
